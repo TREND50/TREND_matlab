@@ -11,7 +11,6 @@ end
 isSimu = 0;
 cutsettings.ThetaCut = 80;
 cutsettings.RCut = 500;  % % Mini radius [m]
-%cutsettings.RCut = 500;  % % Mini radius [m]
 cutsettings.Chi2sCut = 30;
 cutsettings.Chi2pCut = 30;
 %cutsettings.Chi2pCut = 50;
@@ -56,9 +55,9 @@ if size(periodID,1)==0
     return
 end
 
-%candname = sprintf('../data/candidates/Candidates_Period%d.mat',periodID);
-candname = sprintf('Candidates_Period%d_102014.mat',periodID);
+candname = [CAND_PATH sprintf('Candidates_Period%d.mat',periodID)];
 disp(sprintf('Now loading DST %s...',candname))
+
 if fopen(candname)>0
     % load dst
     c = open(candname);
@@ -86,21 +85,7 @@ if fopen(candname)>0
        fclose all;
        return
    end
-    %CandidateThetaS(thisRun) = [];
-    %CandidatePhiS(thisRun) = [];
-    %CandidateRadius(thisRun) = [];
-   %CandidateAntennas(thisRun) = [];
-   %CandidateDirNeighbourgs(thisRun) = [];
-   %CandidateNeighbourgs(thisRun) = [];
-    %	CandidateMaxAnt(thisRun) = [];
-    %	CandidateBadAnt(thisRun) = [];   
-    %	CandidatePhiP(thisRun) = [];
-       %CandidateThetaP(thisRun) = [];
-       %CandidateChi2P(thisRun) = [];	 
-       %CandidateTime(thisRun) = [];
-    	 %CandidateCoinc(thisRun) = [];
-    	 %CandidateRun(thisRun) = [];	
-    	 %CandidateRatioAmp(thisRun) = [];   
+   
 else
     disp(sprintf('No DST %s...',candname))
     CandidateRun=[];
@@ -119,6 +104,7 @@ else
     CandidateDirNeighbourgs={};
     CandidateRatioAmp = [];   
 end
+
 disp 'Done.'
 
 %% Get number of sub dsts
@@ -126,7 +112,8 @@ stopflag=0;
 nbiter=1;
 while stopflag==0
     %filename = [DST_PATH sprintf('dst%d_%d_light.mat',nrun,nbiter)];
-    filename = [DST_PATH sprintf('dst%d_%d.mat',nrun,nbiter)];
+    
+    filename = [DST_PATH sprintf('dst%d_%d.mat',nrun,nbiter)]
     fd=fopen(filename);
     if fd~=-1
         nbiter=nbiter+1;
@@ -145,6 +132,8 @@ end;
 
 %% Loop on sub dsts
 meta = 1;
+filename = [CAND_PATH sprintf('selection_%d.txt',periodID)];
+
 while meta<=nbiter
 
     %% Load dst
@@ -480,7 +469,8 @@ while meta<=nbiter
         end
     end
     res = [nrun meta res n1 n2 n3 n4 n5 length(find(CandidateRun==nrun))]
-    fid = fopen(sprintf('selection_%d.txt',periodID), 'a+' );
+    filename
+    fid = fopen(filename, 'a+' )
     fprintf( fid, '%6d ', res(1));   % Run
     fprintf( fid, '%6d ', res(2));   % MetaRun
     fprintf( fid, '%6d ', res(3));   % Nini

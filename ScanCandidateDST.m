@@ -12,9 +12,8 @@ end
 SharedGlobals;
 %close all;
 
-dstname = sprintf('Candidates_Period%d_102014.mat',PeriodId);
-%dstname = ['../data/candidates/', dstname]; 
-dstname = ['../data/candidates/candidates_dst102014/', dstname]; 
+dstname = sprintf('Candidates_Period%d.mat',PeriodId);
+dstname = [CAND_PATH dstname]; 
 if fopen(dstname)<0
     disp(sprintf('File %s not found. Abort.',dstname))
     thpel = [];
@@ -136,13 +135,16 @@ val = [ncand n1 n2 n6 n7 n3 n4 n5 n8 length(sel)]
 %pause
 
 %% Load CandidateTag.mat
-t = load('CandidateTag.mat');
-runt = t.RunId;
-coinct = t.CoincId;
-tag = t.Tag;
-% runt = [];
-% coinct = [];
-% tag = [];
+if fopen('CandidateTag.mat')>0
+	t = load('CandidateTag.mat');
+	runt = t.RunId;
+	coinct = t.CoincId;
+	tag = t.Tag;
+else
+	runt = [];
+	coinct = [];
+	tag = [];
+end
 sel2 = [];
 
 if down == 1

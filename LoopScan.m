@@ -14,8 +14,8 @@ radtot = [];
 ramptot = [];
 
 if EW==1
-    pstart = 1;
-    pstop = 8;
+    pstart = 6;
+    pstop = 6;
 else
     pstart = 9;
     pstop = 10;
@@ -114,6 +114,8 @@ t = length(phtot);
 n = length(find(phtot<90 | phtot>270));
 w = length(find(phtot<180));
 
+
+
 nw = length(find(phtot>0 & phtot<90))
 sw = length(find(phtot>90 & phtot<180))
 se = length(find(phtot>180 & phtot<270))
@@ -126,3 +128,4 @@ disp(sprintf('North/South = %d/%d (%3.1f pc excess)',n,t-n,n/t*100))
 disp(sprintf('West/East = %d/%d (%3.1f pc excess)',w,t-w,w/t*100))
 s = w-(t-w)
 s/t*100
+[thtot' phtot']

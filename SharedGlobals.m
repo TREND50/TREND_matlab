@@ -1,9 +1,9 @@
 global C0 RAWDATA_PATH DST_PATH REFWE REFSN REFALT RAD2DEG DEG2RAD cutsettings labelOpts;
 
-%addpath('../matlab_tools/')
+addpath('../matlab_tools/')
 
 %% Data Challenge or not
-DC=1;
+DC=1
 if DC == 1
   energy_eV = '5e17';
 end
@@ -32,12 +32,6 @@ ErrorTrigScint = 4; % Trigger tagging error in units of samples (<=> 10ns)
 ErrorAmp = 0.15; % Amplitue measurment error (fraction of total) 
 runs2010 = [1:2400, 17886, 17959, 180234, 209212, 20979]; 
 ALLDETS = [101:140 148:158];
-%ibuff=2048;
-%ibuffs=1024;
-%R1795 & R1802
-%ibuff = 2048;
-%ibuffs = 2048; 
-%nrun>2000
 ibuff = 1024;
 ibuffs = 1024;
 ibufft = 4;
@@ -128,7 +122,6 @@ if AnalysisType>0
 end
 if AnaFast == 1
     CORREL = 0;
-%    AnalysisType = 1;   
 end
 CORDELAYS = 0;
 DISPLAY = 0;
@@ -143,11 +136,8 @@ granularity_box  = 40e-9; % s (!!!! used in RawFilter too !!!)
 max_out = 0;
 max_out_ToT   = 300e-9; % s
 max_block_ToT   = 350e-9; % s  % Was 350ns. Modified 28/02 for DAQproto events (large bounce)
-%bounce_ratio    = 0.8;
-%inhibit_window  = 200e-9; % s
 noise_mode      = 1;
 max_pretrig_ToT = 200e-9;
-%pre_trig_win = 300e-9;
 
 %% Background runs variables
 size_event=1024; % bytes
@@ -157,50 +147,59 @@ nbevent=1024; % 1024 events of 1024 bytes by loop in background run
 CC=1;
 if CC==0  % Local PCS, no environment variables defined
         RAWDATA_PATH = '../data/raw/';
-        BCKGR_PATH = '../data/back/';
-        SELDATA_PATH = '../data/raw/';
-        SURVEY_PATH = RAWDATA_PATH;
-        LOG_PATH = '../data/log/';
-        HYB_PATH = '../data/dst/dst_hyb/';
-        SCI_PATH = '../data/dst/dst_scint/';
-        STD_PATH = 'F:/data/dst_std/';
-        MONITOR_PATH = '../data/monitor/';
-        PSD_PATH = '../data/psd/';
         TEXT_PATH = './';
         CXX_PATH = '/home/martineau/TREND/cxx/';
-        SIMU_PATH = 'G:/data/simu/trend-50/1e17/';
+        LOG_PATH = '../data/log/';
+        MONITOR_PATH = '../data/monitor/';
+        if DC
+            CAND_PATH = '../data/candidates/candidates_dc/'
+        else
+            CAND_PATH = '../data/candidates/candidates_test/'
+        end
+        PSD_PATH = '../data/psd/';
+        STD_PATH = '../data/dst/dst_std/dst102014/';
+        HYB_PATH = '../data/dst/dst_hyb/';
+        SCI_PATH = '../data/dst/dst_scint/';
+        if DC 
+            DST_PATH = ['../data/dst/dst_dc/' energy_eV '/'];
+        else
+            if AnalysisType == 0
+                DST_PATH = STD_PATH;
+            elseif AnalysisType == 1
+                DST_PATH = HYB_PATH;
+            elseif AnalysisType == 2
+                DST_PATH = SCI_PATH;
+            end
+        end
+        BCKGR_PATH = '../data/back/';
+        BACKDST_PATH = '../data/back/';
+        SELDATA_PATH = '../data/raw/';
+        SURVEY_PATH = RAWDATA_PATH;
+        %SIMU_PATH = 'G:/data/simu/trend-50/1e17/';
         if HARD
             ACC_PATH = '../data/acceptance/hard/';
         else
             ACC_PATH = '../data/acceptance/soft/';
         end        
-        BACKDST_PATH = '../data/back/';
-        if AnalysisType == 0
-            DST_PATH = STD_PATH;
-        elseif AnalysisType == 1
-            DST_PATH = HYB_PATH;
-        elseif AnalysisType == 2
-            DST_PATH = SCI_PATH;
-        end
 else  % @CC
     MONITOR_PATH = './';
     if DC  % Data challenge
         RAWDATA_PATH = [getenv( 'TREND_DATADC_PATH' )  energy_eV  '/'];
         if isempty( RAWDATA_PATH )
-           disp( '$TREND_DATADC_PATH is undefined.' );
-          RAWDATA_PATH = ['/sps/hep/trend/datachallenge/' energy_eV  '/'];
-	end
+            disp( '$TREND_DATADC_PATH is undefined.' );
+            RAWDATA_PATH = ['/sps/hep/trend/datachallenge/' energy_eV  '/'];
+        end
     else  % Regular data
-	RAWDATA_PATH = getenv( 'TREND_DATA_PATH' ) 
+        RAWDATA_PATH = getenv( 'TREND_DATA_PATH' ); 
         if isempty( RAWDATA_PATH )
            disp( '$TREND_DATA_PATH is undefined.' );
-  	   RAWDATA_PATH = '/sps/hep/trend/data/';
-	end
+  	       RAWDATA_PATH = '/sps/hep/trend/data/';
+	    end
     end
     CXX_PATH = getenv( 'TREND_CXX_PATH' );
     if isempty( CXX_PATH )
         disp( '$TREND_CXX_PATH is undefined.' );
- 	CXX_PATH = '/afs/in2p3.fr/throng/trend/soft/ana/TREND_recons/';
+ 	    CXX_PATH = '/afs/in2p3.fr/throng/trend/soft/ana/TREND_recons/';
     end
     TEXT_PATH = getenv( 'TREND_TEXT_PATH' );
     if isempty( TEXT_PATH )
@@ -211,26 +210,31 @@ else  % @CC
         DST_PATH = [getenv( 'TREND_DSTDC_PATH' ) energy_eV '/'];
         if isempty(DST_PATH)
             disp( '$TREND_DSTDC_PATH is undefined.' );
-	    DST_PATH = ['/sps/hep/trend/dst_datachallenge/' energy_eV '/'];
-	end
+	        DST_PATH = ['/sps/hep/trend/dst_datachallenge/' energy_eV '/'];
+        end
     else  % Regular data
         DST_PATH = getenv( 'TREND_DST_PATH' );       
-	if isempty(DST_PATH)
+        if isempty(DST_PATH)
             disp( '$TREND_DST_PATH is undefined.' );
-	    DST_PATH='/afs/in2p3.fr/home/throng/trend/scratch/dst/';
-	end
+            DST_PATH='/afs/in2p3.fr/home/throng/trend/scratch/dst/';
+        end
     end
+   if DC
+       CAND_PATH = '/sps/hep/trend/TREND_candidates/dc/'
+   else
+       CAND_PATH =  '/sps/hep/trend/TREND_candidates/data/'
+   end
     
     PSD_PATH = getenv( 'TREND_PSD_PATH' );
     if isempty( PSD_PATH )
         disp( '$TREND_PSD_PATH is undefined.' );
-        PSD_PATH =   '/sps/hep/trend/psd/'
+        PSD_PATH =   '/sps/hep/trend/psd/';
     end
 
     CAL_PATH = getenv( 'TREND_CAL_PATH' );
     if isempty( CAL_PATH )
         disp( '$TREND_CAL_PATH is undefined.' );
-        CAL_PATH =   '/sps/hep/trend/dstcalib/'
+        CAL_PATH =   '/sps/hep/trend/dstcalib/';
     end
     %SIMU_PATH = '/sps/hep/trend/trend-50/';
     %LOG_PATH = '/sps/hep/trend/log/';
