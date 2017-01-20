@@ -1,0 +1,12 @@
+# Ignore temporary folder for matlab compilation.
+matlab_compil
+
+# Ignore binary data.
+*.bin
+DstBuilder
+
+# Ignore manual backups.
+*.old
+
+# Ignore bash scripts.
+*.sh
