@@ -8,5 +8,9 @@ DstBuilder
 # Ignore manual backups.
 *.old
 
+# Ignore Matlab automatic backups.
+*.asv
+
+
 # Ignore bash scripts.
 *.sh
