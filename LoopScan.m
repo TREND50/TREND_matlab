@@ -14,13 +14,14 @@ radtot = [];
 ramptot = [];
 
 if EW==1
-    pstart = 6;
-    pstop = 6;
+    pstart = 1;
+    pstop = 8;
 else
     pstart = 9;
     pstop = 10;
 end
 
+down
 for i=pstart:pstop
    [thp php mult rad ramp] = ScanCandidateDST(i,down);
    sel = find(php>0 & thp>0 & thp<=80);

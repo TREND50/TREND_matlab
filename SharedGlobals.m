@@ -1,9 +1,11 @@
 global C0 RAWDATA_PATH DST_PATH REFWE REFSN REFALT RAD2DEG DEG2RAD cutsettings labelOpts;
 
-addpath('../matlab_tools/')
+%addpath('../matlab_tools/')
+
+CC=0;
 
 %% Data Challenge or not
-DC=1
+DC=0;
 if DC == 1
   energy_eV = '5e17';
 end
@@ -11,8 +13,11 @@ end
 C0 = 2.99792458e8;  %m/s
 DEG2RAD=pi/180;
 RAD2DEG=180./pi;
-phigeo = 182.66;
-thetageo = 27.05;
+phigeo = 182.66;  %Not to be trusted (referential?)
+thetageo = 27.05;  %Not to be trusted (referential?)
+% In GRAND ref (x=N, y=W, z=Up), direction pointed to:
+phigeom = 2.66;  % West of North (<=>Declination = -2.66°)
+thetageom = 152.92;  % Here theta = 0° <=> up. 152.92° <=> 62.95° below horizon (<=>Inclination = 62.95°)  
 labelOpts = { 'FontSize', 14 };
 scrsz = get( 0, 'ScreenSize' );
 
@@ -144,7 +149,6 @@ size_event=1024; % bytes
 nbevent=1024; % 1024 events of 1024 bytes by loop in background run
 
 %% PATHS
-CC=1;
 if CC==0  % Local PCS, no environment variables defined
         RAWDATA_PATH = '../data/raw/';
         TEXT_PATH = './';
@@ -152,9 +156,9 @@ if CC==0  % Local PCS, no environment variables defined
         LOG_PATH = '../data/log/';
         MONITOR_PATH = '../data/monitor/';
         if DC
-            CAND_PATH = '../data/candidates/candidates_dc/'
+            CAND_PATH = '../data/candidates/candidates_dc/';
         else
-            CAND_PATH = '../data/candidates/candidates_test/'
+            CAND_PATH = '../data/candidates/sauv/candidates_dst102014/';
         end
         PSD_PATH = '../data/psd/';
         STD_PATH = '../data/dst/dst_std/dst102014/';
@@ -174,6 +178,7 @@ if CC==0  % Local PCS, no environment variables defined
         BCKGR_PATH = '../data/back/';
         BACKDST_PATH = '../data/back/';
         SELDATA_PATH = '../data/raw/';
+        CAL_PATH = '../data/cal/';
         SURVEY_PATH = RAWDATA_PATH;
         %SIMU_PATH = 'G:/data/simu/trend-50/1e17/';
         if HARD

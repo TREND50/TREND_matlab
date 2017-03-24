@@ -5,6 +5,7 @@ function [thpel phpel mult radel rampel run coinc val] = ScanCandidateDST(Period
 % down = 0: only displays all selected events
 % down = -1: dispay selected==1 AND tag==1 events (Double selection)
 
+
 if ~exist('down')  
   down = 0;
 end
@@ -12,13 +13,15 @@ end
 SharedGlobals;
 %close all;
 
-dstname = sprintf('Candidates_Period%d.mat',PeriodId);
+dstname = sprintf('Candidates_Period%d_102014.mat',PeriodId);
 dstname = [CAND_PATH dstname]; 
 if fopen(dstname)<0
     disp(sprintf('File %s not found. Abort.',dstname))
     thpel = [];
     phpel = [];
     mult = [];
+    radel = [];
+    rampel = [];
     RunId = [];
     CoincId = [];
     return
@@ -132,7 +135,7 @@ sel = find(valid==1);
 val = [ncand n1 n2 n6 n7 n3 n4 n5 n8 length(sel)]
 % ncand
 % 
-%pause
+pause
 
 %% Load CandidateTag.mat
 if fopen('CandidateTag.mat')>0
@@ -219,29 +222,26 @@ for i=1:length(sel)
       continue
   end
   mult(i) = length(c.CandidateAntennas{1,sel(i)});
-  antsin = c.CandidateAntennas{1,sel(i)}
+  antsin = c.CandidateAntennas{1,sel(i)};
   if size(find(antsin==137),2)==1
       disp 'Antenna 137 in!'
-      n137 = n137+1
+      n137 = n137+1;
   end
   if size(find(antsin==115),2)==1
       disp 'Antenna 115 in!'
-      n115 = n115+1
+      n115 = n115+1;
   end
   if size(find(antsin==128),2)==1
       disp 'Antenna 128 in!'
-      n128 = n128+1
+      n128 = n128+1;
   end
   if size(find(antsin==112),2)==1 
       disp 'Antenna 112 in!'
-      n112 = n112+1
+      n112 = n112+1;
   end  
 end
-n137
-n115
-n128
-n112
-pause
+
+%pause
 % 
 % for i=1:length(sel)
 %   CandidateTag(run(sel(i)),coinc(sel(i)))
