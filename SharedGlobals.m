@@ -5,7 +5,7 @@ global C0 RAWDATA_PATH DST_PATH REFWE REFSN REFALT RAD2DEG DEG2RAD cutsettings l
 CC=0;
 
 %% Data Challenge or not
-DC=0;
+DC=1;
 if DC == 1
   energy_eV = '5e17';
 end
@@ -165,7 +165,7 @@ if CC==0  % Local PCS, no environment variables defined
         HYB_PATH = '../data/dst/dst_hyb/';
         SCI_PATH = '../data/dst/dst_scint/';
         if DC 
-            DST_PATH = ['../data/dst/dst_dc/' energy_eV '/'];
+            DST_PATH = '../data/dst/dst_dc/';
         else
             if AnalysisType == 0
                 DST_PATH = STD_PATH;
