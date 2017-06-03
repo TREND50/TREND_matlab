@@ -62,6 +62,8 @@ else
     planRecons.dPhi = dPhip;
     planRecons.Chi2 = chi2;
     planRecons.Signif = signif;    
+    planRecons.Chi2Delay= chi2; %SL
+    planRecons.SlopeDelay= chi2; %SL
     % 
     if Type==0
         Struct.Coinc.PlanRecons.Radio = planRecons;
