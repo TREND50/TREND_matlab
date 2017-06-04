@@ -5,7 +5,7 @@ function [] = CandidateAnalysis_v2(nrun,dstf)
 
 SharedGlobals;
 if nrun == 3202  
-  disp 'Skip R302, too big'
+  disp 'Skip R3202, too big'
   return
 end
 isSimu = 0;
@@ -399,7 +399,7 @@ while meta<=nbiter
             end
         end
         if skip > 1           
-            %disp(sprintf('Wrong ground pattern: antenna %d did not trigger. Skip candidate.',Detectors(icenout(j))))
+             %disp(sprintf('Wrong ground pattern: antenna %d did not trigger. Skip candidate.',Detectors(icenout(j))))
              %disp(sprintf('Coinc %d: bad trigger pattern. Skip candidate.',idp(ind)))
              n3 = n3+1;
              continue

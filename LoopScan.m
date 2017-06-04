@@ -79,7 +79,7 @@ for i=1:36
     pht(i) = mean(phtot(sel));
     N(i) = length(sel);
 end    
-errorbar(pht,N/max(N),sqrt(N)/max(N), 'sk-','MarkerFaceColor','k' );
+errorbar(pht,N/max(N),sqrt(N)/max(N), 'sr-','MarkerFaceColor','r' );
 grid on
 xlim([0 361])
 

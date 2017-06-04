@@ -5,7 +5,7 @@ global C0 RAWDATA_PATH DST_PATH REFWE REFSN REFALT RAD2DEG DEG2RAD cutsettings l
 CC=0;
 
 %% Data Challenge or not
-DC=1;
+DC=0;
 if DC == 1
   energy_eV = '5e17';
 end
@@ -13,11 +13,11 @@ end
 C0 = 2.99792458e8;  %m/s
 DEG2RAD=pi/180;
 RAD2DEG=180./pi;
-phigeo = 182.66;  %Not to be trusted (referential?)
-thetageo = 27.05;  %Not to be trusted (referential?)
+%phigeo = 182.66;  %Not to be trusted (referential?)
+%thetageo = 27.05;  %Not to be trusted (referential?)
 % In GRAND ref (x=N, y=W, z=Up), direction pointed to:
 phigeom = 2.66;  % West of North (<=>Declination = -2.66°)
-thetageom = 152.92;  % Here theta = 0° <=> up. 152.92° <=> 62.95° below horizon (<=>Inclination = 62.95°)  
+thetageom = 152.95;  % Here theta = 0° <=> up. 152.95° <=> 62.95° below horizon (<=>Inclination = 62.95°)  
 labelOpts = { 'FontSize', 14 };
 scrsz = get( 0, 'ScreenSize' );
 

@@ -132,7 +132,7 @@ else
 end;
 
 DCfile=load([DST_PATH E '/log_recoverall.txt'], 'r' );
-fid = fopen([CAND_PATH E '/log_candanalysis.txt'], 'a' ); %SL
+fid = fopen([CAND_PATH E '/log_candanalysis.txt'], 'a+' ); %SL
 
 %% Loop on sub dsts
 meta = 1;
@@ -478,7 +478,7 @@ while meta<=nbiter
         ncommon = com(find(TimeCut==cutsettings.TimeCut),find(frac==cutsettings.AntRatioCut));
         ncomdir = comdir(find(DirTimeCut/60==cutsettings.DirTimeCut),find(frac==cutsettings.AntRatioCut));
         
-        if (ncommon<=cutsettings.MaxAnt & ncomdir<=cutsettings.DirMaxAnt) | isSimu == 1 
+        if (ncommon<=cutsettings.MaxAnt & ncomdir<=cutsettings.DirMaxAnt)
             disp(sprintf('Coinc %d: candidate selected!',idp(ind)))
             CandidateRun=[CandidateRun nrun];
             CandidateCoinc=[CandidateCoinc idp(ind)];
@@ -523,26 +523,28 @@ while meta<=nbiter
         end
         %fclose(fid)
     end
-
     res = [nrun meta res n1 n2 n3 n4 n5 length(find(CandidateRun==nrun))]
-    fid = fopen([DST_PATH '/' E '/' sprintf('selection_%d.txt',periodID)], 'a+' );
-    fprintf( fid, '%6d ', res(1));   % Run
-    fprintf( fid, '%6d ', res(2));   % MetaRun
-    fprintf( fid, '%6d ', res(3));   % Nini
-    fprintf( fid, '%6d ', res(4));   % Mult
-    fprintf( fid, '%6d ', res(5));   % Radius
-    fprintf( fid, '%6d ', res(6));   % ValidPlan
-    fprintf( fid, '%6d ', res(7));   % Theta
-    fprintf( fid, '%6d ', res(8));   % n1
-    fprintf( fid, '%6d ', res(9));   % n2
-    fprintf( fid, '%6d ', res(10)); % n3
-    fprintf( fid, '%6d ', res(11)); % n4
-    fprintf( fid, '%6d ', res(12));   % n5
-    fprintf( fid, '%6d ', res(13));   % nCands
-    fprintf( fid, '\n' );
+    fid2 = fopen([DST_PATH '/' E '/' sprintf('selection_%d.txt',periodID)], 'a+' );
+    fprintf( fid2, '%6d ', res(1));   % Run
+    fprintf( fid2, '%6d ', res(2));   % MetaRun
+    fprintf( fid2, '%6d ', res(3));   % Nini
+    fprintf( fid2, '%6d ', res(4));   % Mult
+    fprintf( fid2, '%6d ', res(5));   % Radius
+    fprintf( fid2, '%6d ', res(6));   % ValidPlan
+    fprintf( fid2, '%6d ', res(7));   % Theta
+    fprintf( fid2, '%6d ', res(8));   % n1
+    fprintf( fid2, '%6d ', res(9));   % n2
+    fprintf( fid2, '%6d ', res(10)); % n3
+    fprintf( fid2, '%6d ', res(11)); % n4
+    fprintf( fid2, '%6d ', res(12));   % n5
+    fprintf( fid2, '%6d ', res(13));   % nCands
+    fprintf( fid2, '\n' );
+    fclose(fid2);
     meta = meta+1;
 end
 fclose(fid);
+
+
 disp(sprintf('%d candidates selected in run %d.',length(find(CandidateRun==nrun)),nrun))
 
 if length(find(CandidateRun==nrun))>0  % Candidates have been found

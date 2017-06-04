@@ -3,6 +3,12 @@ function [] = SelectedPlot_DC(E)
 SharedGlobals
 SIMCODE='ZHAIRESall'
 
+selfile = load([CAND_PATH E '/log_candanalysis.txt'], 'r' );
+thetai=selfile(:,2);
+phii=mod(selfile(:,3)-90,360);  % use TREND convention
+thetareconsi=selfile(:,15);
+phireconsi=selfile(:,16);
+
 selfile = load([CAND_PATH E '/log_candanalysisend.txt'], 'r' );
 theta=selfile(:,2);
 phi=mod(selfile(:,3)-90,360);  % use TREND convention
@@ -73,9 +79,9 @@ hist(theta,9)
 saveas(figure(8),sprintf('coinctheta%s%s.png',SIMCODE,E))
 
 figure(4)
-plot(theta(sel==1),thetarecons(sel==1),'g*')
+plot(thetai,thetareconsi,'k*')
 hold on
-plot(theta(sel==0),thetarecons(sel==0),'k*')
+plot(theta(sel==1),thetarecons(sel==1),'g*')
 x=[0:1:90];
 plot(x,x,'k')
 grid on
@@ -88,9 +94,9 @@ hist(nindst./ntrigs,10);
 saveas(figure(5),sprintf('nantsratio%s%s.png',SIMCODE,E))
 
 figure(6)
-plot(phi(sel==1),mod(phirecons(sel==1),360),'g*')
+plot(phii,phireconsi,'k*')
 hold on
-plot(phi(sel==0),mod(phirecons(sel==0),360),'k*')
+plot(phi(sel==1),mod(phirecons(sel==1),360),'g*')
 x=[0:1:360];
 plot(x,x,'k')
 grid on
