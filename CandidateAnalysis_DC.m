@@ -1,15 +1,23 @@
-function [] = CandidateAnalysis_v2(nrun,dstf)
+function [] = CandidateAnalysis_DC(E,nrun,dstf)
 % Select candidates v2.
 % Writes it to dst.
 % OMH 18/06/2013
+% Adapted to DataChallenge analysis
+% SL 01/04/2017
 
 SharedGlobals;
+if DC==0
+    disp (sprintf('Error! DC = %d! Update SharedGlobals.m Aborting.',DC))
+    return
+end
+%E='3e18' %SL
+DISPLAY=0 %SL
 if nrun == 3202  
   disp 'Skip R3202, too big'
   return
 end
 isSimu = 0;
-cutsettings.ThetaCut = 80;
+cutsettings.ThetaCut = 81; %SL test
 cutsettings.RCut = 500;  % % Mini radius [m]
 cutsettings.Chi2sCut = 30;
 cutsettings.Chi2pCut = 30;
@@ -26,17 +34,17 @@ cutsettings.TimeVector = [30 60 120 150];  %seconds
 cutsettings.DirTimeVector = [180 600 1200 1800];  %seconds
 cutsettings.Frac = [0 0.3 0.5 0.66 0.8]; % Fraction of antennas in common
 frac = cutsettings.Frac;
-if isSimu == 1
-    alivecut = 1;  % Nb of events below which detector is assumed dead.
-else
-    alivecut = 100;  
-end
+alivecut = 100;  
+
+%% Read simu recover %SL
+DCfile=load([DST_PATH E '/log_recoverall.txt'], 'r' );
+runs=DCfile(:,4);
+simucoincs=DCfile(:,13);
+trigscore=DCfile(:,8);
+simucoinc=simucoincs(simucoincs~=0 & runs==nrun & trigscore>=4);
 
 %% Load valid Candidates DST
 periods = zeros(10,2);
-% if isSimu
-%     periods(100,:) = [1017 5017]; % Simu
-% end
 periods(1,:) = [2538 2585];  % 
 periods(2,:) = [2685 2890];  %
 periods(3,:) = [3000 3086];  % 
@@ -55,9 +63,8 @@ if size(periodID,1)==0
     return
 end
 
-candname = [CAND_PATH sprintf('Candidates_Period%d.mat',periodID)];
+candname = [CAND_PATH E '/' sprintf('Candidates_Period%d_102014.mat',periodID)];
 disp(sprintf('Now loading DST %s...',candname))
-
 if fopen(candname)>0
     % load dst
     c = open(candname);
@@ -76,8 +83,6 @@ if fopen(candname)>0
     CandidateNeighbourgs = c.CandidateNeighbourgs;
     CandidateDirNeighbourgs = c.CandidateDirNeighbourgs;
     CandidateRatioAmp = c.CandidateRatioAmp;
-    %
-
     %Clear data for this run
     thisRun = find(CandidateRun==nrun);
    if size(thisRun,2)
@@ -85,7 +90,6 @@ if fopen(candname)>0
        fclose all;
        return
    end
-   
 else
     disp(sprintf('No DST %s...',candname))
     CandidateRun=[];
@@ -104,16 +108,13 @@ else
     CandidateDirNeighbourgs={};
     CandidateRatioAmp = [];   
 end
-
 disp 'Done.'
 
 %% Get number of sub dsts
 stopflag=0;
 nbiter=1;
 while stopflag==0
-    %filename = [DST_PATH sprintf('dst%d_%d_light.mat',nrun,nbiter)];
-    
-    filename = [DST_PATH sprintf('dst%d_%d.mat',nrun,nbiter)]
+    filename = [DST_PATH E sprintf('/dst%d_%d.mat',nrun,nbiter)];
     fd=fopen(filename);
     if fd~=-1
         nbiter=nbiter+1;
@@ -130,21 +131,17 @@ else
     display(sprintf('%d dst(s) found for run %d.',nbiter,nrun))
 end;
 
+DCfile=load([DST_PATH E '/log_recoverall.txt'], 'r' );
+fid = fopen([CAND_PATH E '/log_candanalysis.txt'], 'a+' ); %SL
+
 %% Loop on sub dsts
 meta = 1;
-filename = [CAND_PATH sprintf('selection_%d.txt',periodID)];
-
 while meta<=nbiter
 
     %% Load dst
     if ~exist('dstf')
-        if isSimu
-            dstname = [DST_PATH sprintf(dst_filename,nrun,meta)];
-        else
-            dstname = [DST_PATH sprintf('dst%d_%d.mat',nrun,meta)];
-        end
+        dstname = [DST_PATH E sprintf('/dst%d_%d.mat',nrun,meta)];
         disp(sprintf('Loading dst %d for run %d...',meta,nrun))
-        dstname
         dst = load(dstname);
         disp 'Done.'
     else
@@ -165,23 +162,14 @@ while meta<=nbiter
     else
         stat = CoincStruct.Det.Status;
     end
-    if CORDELAYS == 1
-        PlanStruct = CoincStruct.DelayCorrRecons.PlanRecons.Radio;
-        SphStruct = CoincStruct.DelayCorrRecons.SphRecons;
-    else
-        PlanStruct = CoincStruct.PlanRecons.Radio;
-        SphStruct = CoincStruct.SphRecons;
-    end
+    PlanStruct = CoincStruct.PlanRecons.Radio;
+    SphStruct = CoincStruct.SphRecons;
     RunSetup = dst.Struct.Setup;
     X = [RunSetup.Det.X];
     Y = [RunSetup.Det.Y];
     Z = [RunSetup.Det.Z];
     mult = CoincStruct.Mult;
-    if isSimu
-        timemat = zeros(ncoincs,length(Detectors));
-    else
-        timemat = CoincStruct.Det.UnixTime;
-    end
+    timemat = CoincStruct.Det.UnixTime;
     times = max(timemat,[],2);  % seconds
     date_start = min(times);
     times = times-date_start;
@@ -192,8 +180,6 @@ while meta<=nbiter
     ys = SphStruct.Y0;
     zs = SphStruct.Z0;
     phip = PlanStruct.Phi;
-%     thetas = SphStruct.Theta;
-%     phis = SphStruct.Phi;  
     r = SphStruct.minDistSource;
     chi2s = SphStruct.Chi2Delay;
     slopes = SphStruct.SlopeDelay;
@@ -222,52 +208,94 @@ while meta<=nbiter
         philoc = mod(atan2(-(aX(idist(2:nmax))-aX(icen(i))),(aY(idist(2:nmax))-aY(icen(i))))*180/pi,360);        
         for j = 1:4
             if j==1 | j==3  % Select detectors in North & South quadrants
-%                sel = find(abs(philoc-90*(j-1))<45);
                 sel = find(abs(philoc-90*(j-1))<45);  
             else  % East & West
-%                 sel = find(abs(philoc-90*(j-1))<30);
                  sel = find(abs(philoc-90*(j-1))<45);
             end
             neid(i,j+1) = {nei(sel)};
-%             [neid{i,1} j 00 neid{i,j+1}]
         end
     end
     
     %% First selection
     disp(sprintf('%d coincs in total.',ncoincs))
-    if isSimu == 1
-        for i=1:ncoincs
-            thetar(i)=dst.Struct.Simu{i}.Dir(1);
-        end
-        nthetagood = length(find(thetar<cutsettings.ThetaCut));
-        disp(sprintf('With theta*<%d deg:%d ',cutsettings.ThetaCut,nthetagood))
-    end
+    disp(sprintf('%d coincs are simu coinc.',length(simucoinc)))
+    [a indsim b ] = intersect(idp,simucoinc);
+    [a inddata b] = setxor(idp,simucoinc);
     sel = find(mult>4);
-    disp(sprintf('With L>4: %d',length(sel)))
-    res = [ncoincs length(sel)];
-    %sel = intersect(sel,find(chi2s<cutsettings.Chi2sCut & abs(slopes-1)<1.1));
-    %disp(sprintf('With valid spherical recons: %d',length(sel)))
-    %sel = intersect(sel, find(chi2p<cutsettings.Chi2pCut & abs(slopep-1)<1.1));
-    sel = intersect(sel, find(r>cutsettings.RCut));
-    disp(sprintf('With radius>%d m: %d',cutsettings.RCut,length(sel)))
-    res = [res length(sel)];
-    sel = intersect(sel, find(chi2p<cutsettings.Chi2pCut));
-    res = [res length(sel)];
-    disp(sprintf('With valid plan recons: %d',length(sel)))
-    sel = intersect(sel, find(thetap<cutsettings.ThetaCut));
-    disp(sprintf('With ThetaPlan < %d deg: %d',cutsettings.ThetaCut,length(sel)));
-    res = [res length(sel)];
-    %pause
+    simusel= intersect(sel, indsim); %SL
+    sel=intersect(sel,inddata);
+    disp(sprintf('Data With L>4: %d',length(sel)))
+    disp(sprintf('Simu With L>4: %d',length(simusel)))%SL
+    res = [length(inddata) length(sel)];
+    simures=[length(indsim) length(simusel)]; %SL
     
-    %% NS polar cut
-%     if periodID>=9
-%         ewpolar = [148:155];
-%         [c,indEW] = intersect(Detectors,ewpolar);
-%         sel = intersect(sel,find(sum(tag(:,indEW),2)==0));
-%         %disp(sprintf('With no trigger on EW polar antennas: %d',length(sel)))
-%     end
-     
+    for s=1:length(indsim) %SL
+        inter=intersect(indsim(s),simusel);
+        if isempty(inter)
+            thiscoinc = idp(indsim(s));
+            thisind = find(simucoincs==thiscoinc);
+            thisline = DCfile(thisind,:);
+            fprintf(fid,'%d ',thisline)
+            fprintf(fid,'0 0 0 0 0 0 0 0 0 \n')
+        end
+    end
+    
+    for s=1:length(simusel) %SL
+        inter=intersect(simusel(s),find(r>cutsettings.RCut));
+        if isempty(inter)
+            thiscoinc = idp(simusel(s));
+            thisind = find(simucoincs==thiscoinc);
+            thisline = DCfile(thisind,:);
+            fprintf(fid,'%d ',thisline)
+            fprintf(fid,'1 0 0 0 0 0 0 0 0\n')  % Setting field 1 to 1 <=> validating previous cut (Mult). Field 2 (Rcut) 1st field at 0 
+        end
+    end
+    sel = intersect(sel, find(r>cutsettings.RCut));
+    simusel=intersect(simusel, find(r>cutsettings.RCut));%SL
+    disp(sprintf('Data With radius>%d m: %d',cutsettings.RCut,length(sel)))
+    disp(sprintf('Simu With radius>%d m: %d',cutsettings.RCut,length(simusel)))%SL
+    res = [res length(sel)];
+    simures=[simures length(simusel)]; %SL    
+    for s=1:length(simusel) %SL
+        inter=intersect(simusel(s),find(chi2p<cutsettings.Chi2pCut));
+        if isempty(inter)
+            thiscoinc=idp(simusel(s));
+            thisind=find(simucoincs==thiscoinc);
+            thisline=DCfile(thisind,:);
+            fprintf(fid,'%d ',thisline)
+            fprintf(fid,'1 1 0 0 0 0 0 0 0\n')
+        end
+    end
+    sel = intersect(sel, find(chi2p<cutsettings.Chi2pCut));
+    simusel = intersect(simusel, find(chi2p<cutsettings.Chi2pCut)); %SL
+    res = [res length(sel)];
+    simures = [simures length(simusel)];%SL
+    disp(sprintf('Data With valid plan recons: %d',length(sel)))
+    disp(sprintf('Simu With valid plan recons: %d',length(simusel)))%SL  
+    
+
+    for s=1:length(simusel) %SL
+        inter=intersect(simusel(s),find(thetap<cutsettings.ThetaCut));
+        if isempty(inter)
+            thiscoinc=idp(simusel(s));
+            thisind=find(simucoincs==thiscoinc);
+            thisline=DCfile(thisind,:);
+            fprintf(fid,'%d ',thisline)
+            fprintf(fid,'1 1 1 0 0 0 0 0 0 \n')
+        end
+    end
+    sel = intersect(sel, find(thetap<cutsettings.ThetaCut));
+    simusel = intersect(simusel, find(thetap<cutsettings.ThetaCut));%SL
+    disp(sprintf('Data With ThetaPlan < %d deg: %d',cutsettings.ThetaCut,length(sel)));
+    disp(sprintf('Simu With ThetaPlan < %d deg: %d',cutsettings.ThetaCut,length(simusel)));%SL
+    res = [res length(sel)];
+    simures = [simures length(simusel)];%SL
+         
     %% Loop on candidates
+    if DC %SL
+        res=simures
+        sel=simusel
+    end
     disp(sprintf('%d possible candidates to be checked.',length(sel)))
     %pause
     n1 = 0;
@@ -276,7 +304,6 @@ while meta<=nbiter
     n4 = 0;
     n5 = 0;
     for i=1:length(sel)
-        
         if i/100==floor(i/100)
             disp(sprintf('%d/%d',i,length(sel)))
         end
@@ -286,6 +313,10 @@ while meta<=nbiter
         
         %% Barycenter
         bary_cand=[mean(X(in)) mean(Y(in)) mean(Z(in))];
+        [t,p,rc] = cart2sph(xs(ind)-bary_cand(1),ys(ind)-bary_cand(2),zs(ind)-bary_cand(3));
+        phisc = t*180/pi-90;
+        phisc = mod(phisc,360);
+        thsc = 90-p*180/pi;
         barydist = zeros(1,length(in));
         for m = 1:length(in)
             barydist(m) = norm(bary_cand-[X(in(m)) Y(in(m)) Z(in(m))]);
@@ -293,31 +324,22 @@ while meta<=nbiter
         if mean(barydist)>cutsettings.BaryCut
           %disp(sprintf('Coinc %d: distance to barycenter > %d m. Skip candidate.',idp(ind),cutsettings.BaryCut))
           n1 = n1+1;
+            if DC
+              thiscoinc=idp(ind);
+              thisind=find(simucoincs==thiscoinc);
+              thisline=DCfile(thisind,:);
+              fprintf(fid,'%d ',thisline)
+              fprintf(fid,'1 1 1 1 0 0 0 0 0\n')
+            end
           continue
         end
-
+        
         %% Amplitude
         calamp = amp(ind,in)./sig(ind,in);  % Calibrated amplitude (std dev normalisation)
         dets = Detectors(in);
         [maxi indmax] = max(calamp);
         mini = min(calamp);
         RatioAmp = maxi/mini;
-        if RatioAmp<cutsettings.AmpRatioCut
-            disp(sprintf('Ratio MaxAmp/MinAmp<%3.1f. Skip candidate.',cutsettings.AmpRatioCut))
-            continue
-        end
-%         if abs(Y(in(indmax)))>100 | dets(indmax)>=148 | dets(indmax)==119 | dets(indmax)==120 
-%             %disp(sprintf('Max amplitude measured on external antenna (A%d). Skip candidate.',dets(indmax)))
-%             continue
-%         end
-        [t,p,rc] = cart2sph(xs(ind)-bary_cand(1),ys(ind)-bary_cand(2),zs(ind)-bary_cand(3));
-        phisc = t*180/pi-90;
-        phisc = mod(phisc,360);
-        thsc = 90-p*180/pi;
-%         if abs(thetap(ind)-thsc)>10 | abs(phip(ind)-phisc)>3 | thsc>86 
-%             disp(sprintf('Plane/Spherical reconstruction offset: theta_sc = %3.1f deg, Delta_theta = %3.1f deg, Delta_phi = %3.1f deg. Skip candidate.',thsc,abs(thetap(ind)-thsc),abs(phip(ind)-phisc)))
-%             continue            
-%         end
         
         %% Status
         status = stat(ind,:);
@@ -333,6 +355,13 @@ while meta<=nbiter
         if sum(bads)>1
             %disp(sprintf('Coinc %d: bad signals on %d antennas. Skip candidate.',idp(ind),sum(bads)))
             n2 = n2+1;
+            if DC
+              thiscoinc=idp(ind);
+              thisind=find(simucoincs==thiscoinc);
+              thisline=DCfile(thisind,:);
+              fprintf(fid,'%d ',thisline);
+              fprintf(fid,'1 1 1 1 1 0 0 0 0\n')
+            end
             continue
         end
         
@@ -399,9 +428,14 @@ while meta<=nbiter
             end
         end
         if skip > 1           
-             %disp(sprintf('Wrong ground pattern: antenna %d did not trigger. Skip candidate.',Detectors(icenout(j))))
-             %disp(sprintf('Coinc %d: bad trigger pattern. Skip candidate.',idp(ind)))
-             n3 = n3+1;
+            n3 = n3+1;
+            if DC
+              thiscoinc=idp(ind);
+              thisind=find(simucoincs==thiscoinc);
+              thisline=DCfile(thisind,:);
+              fprintf(fid,'%d ',thisline)
+              fprintf(fid,'1 1 1 1 1 1 0 0 0 \n')
+             end         
              continue
         end
         
@@ -425,7 +459,7 @@ while meta<=nbiter
         if size(r,1)>1  % Radius defined as a  line vector instead of column for some runs
             r = r';
         end
-        azsel = find(chi2p<cutsettings.Chi2pCut & abs(slopep-1)<0.1 & chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phip-phip(ind))<cutsettings.PhiCut);
+        azsel = find(chi2p<cutsettings.Chi2pCut & abs(slopep-1)<1.1 & chi2s<cutsettings.Chi2sCut & abs(slopes-1)<1.1 & r>500 & abs(phip-phip(ind))<cutsettings.PhiCut);
         
         comdir = zeros(3,5);
         DirTimeCut = cutsettings.DirTimeVector;
@@ -443,9 +477,8 @@ while meta<=nbiter
         end
         ncommon = com(find(TimeCut==cutsettings.TimeCut),find(frac==cutsettings.AntRatioCut));
         ncomdir = comdir(find(DirTimeCut/60==cutsettings.DirTimeCut),find(frac==cutsettings.AntRatioCut));
-        %if 1
-        %[idp(ind) length(timesel) ncommon ncomdir]
-        if (ncommon<=cutsettings.MaxAnt & ncomdir<=cutsettings.DirMaxAnt) | isSimu == 1 
+        
+        if (ncommon<=cutsettings.MaxAnt & ncomdir<=cutsettings.DirMaxAnt)
             disp(sprintf('Coinc %d: candidate selected!',idp(ind)))
             CandidateRun=[CandidateRun nrun];
             CandidateCoinc=[CandidateCoinc idp(ind)];
@@ -462,32 +495,56 @@ while meta<=nbiter
             CandidateRatioAmp=[CandidateRatioAmp RatioAmp];
             CandidateDirNeighbourgs{end+1} = comdir;
             CandidateAntennas{end+1} = Detectors(in);
+            if DC
+              thiscoinc=idp(ind);
+              thisind=find(simucoincs==thiscoinc);
+              thisline=DCfile(thisind,:);
+              fprintf(fid,'%d ',thisline);
+              fprintf(fid,'1 1 1 1 1 1 1 1 1 \n')
+            end   
          elseif  ncomdir>cutsettings.DirMaxAnt   
-             n4 = n4+1;
+            n4 = n4+1;
+            if DC
+              thiscoinc=idp(ind);
+              thisind=find(simucoincs==thiscoinc);
+              thisline=DCfile(thisind,:);
+              fprintf(fid,'%d ',thisline)
+              fprintf(fid,'1 1 1 1 1 1 1 0 0\n')
+            end   
          elseif ncommon>cutsettings.MaxAnt   
-             n5 = n5+1;
+            n5 = n5+1;
+            if DC
+              thiscoinc=idp(ind);
+              thisind=find(simucoincs==thiscoinc);
+              thisline=DCfile(thisind,:);
+              fprintf(fid,'%d ',thisline)
+              fprintf(fid,'1 1 1 1 1 1 1 1 0 \n')
+            end   
         end
+        %fclose(fid)
     end
     res = [nrun meta res n1 n2 n3 n4 n5 length(find(CandidateRun==nrun))]
-    filename
-    fid = fopen(filename, 'a+' )
-    fprintf( fid, '%6d ', res(1));   % Run
-    fprintf( fid, '%6d ', res(2));   % MetaRun
-    fprintf( fid, '%6d ', res(3));   % Nini
-    fprintf( fid, '%6d ', res(4));   % Mult
-    fprintf( fid, '%6d ', res(5));   % Radius
-    fprintf( fid, '%6d ', res(6));   % ValidPlan
-    fprintf( fid, '%6d ', res(7));   % Theta
-    fprintf( fid, '%6d ', res(8));   % n1
-    fprintf( fid, '%6d ', res(9));   % n2
-    fprintf( fid, '%6d ', res(10)); % n3
-    fprintf( fid, '%6d ', res(11)); % n4
-    fprintf( fid, '%6d ', res(12));   % n5
-    fprintf( fid, '%6d ', res(13));   % nCands
-    fprintf( fid, '\n' );
-    fclose(fid);
+    fid2 = fopen([DST_PATH '/' E '/' sprintf('selection_%d.txt',periodID)], 'a+' );
+    fprintf( fid2, '%6d ', res(1));   % Run
+    fprintf( fid2, '%6d ', res(2));   % MetaRun
+    fprintf( fid2, '%6d ', res(3));   % Nini
+    fprintf( fid2, '%6d ', res(4));   % Mult
+    fprintf( fid2, '%6d ', res(5));   % Radius
+    fprintf( fid2, '%6d ', res(6));   % ValidPlan
+    fprintf( fid2, '%6d ', res(7));   % Theta
+    fprintf( fid2, '%6d ', res(8));   % n1
+    fprintf( fid2, '%6d ', res(9));   % n2
+    fprintf( fid2, '%6d ', res(10)); % n3
+    fprintf( fid2, '%6d ', res(11)); % n4
+    fprintf( fid2, '%6d ', res(12));   % n5
+    fprintf( fid2, '%6d ', res(13));   % nCands
+    fprintf( fid2, '\n' );
+    fclose(fid2);
     meta = meta+1;
 end
+fclose(fid);
+
+
 disp(sprintf('%d candidates selected in run %d.',length(find(CandidateRun==nrun)),nrun))
 
 if length(find(CandidateRun==nrun))>0  % Candidates have been found
@@ -513,3 +570,4 @@ if length(find(CandidateRun==nrun))>0  % Candidates have been found
 end
 
 fclose all;
+

@@ -3,7 +3,7 @@ global C0 RAWDATA_PATH DST_PATH REFWE REFSN REFALT RAD2DEG DEG2RAD cutsettings l
 %addpath('/afs/in2p3.fr/throng/trend/soft/ana/matlab_tools/')
 
 %% Data Challenge or not
-DC=1;
+DC=0;
 if DC == 1
   energy_eV = '';
 end
@@ -11,8 +11,11 @@ end
 C0 = 2.99792458e8;  %m/s
 DEG2RAD=pi/180;
 RAD2DEG=180./pi;
-phigeo = 182.66;
-thetageo = 27.05;
+%phigeo = 182.66;  %Not to be trusted (referential?)
+%thetageo = 27.05;  %Not to be trusted (referential?)
+% In GRAND ref (x=N, y=W, z=Up), direction pointed to:
+phigeom = 2.66;  % West of North (<=>Declination = -2.66°)
+thetageom = 152.95;  % Here theta = 0° <=> up. 152.95° <=> 62.95° below horizon (<=>Inclination = 62.95°)  
 labelOpts = { 'FontSize', 14 };
 scrsz = get( 0, 'ScreenSize' );
 
@@ -161,7 +164,7 @@ if CC==0  % Local PCS, no environment variables defined
         HYB_PATH = '../data/dst/dst_hyb/';
         SCI_PATH = '../data/dst/dst_scint/';
         if DC 
-            DST_PATH = ['../data/dst/dst_dc/' energy_eV '/'];
+            DST_PATH = '../data/dst/dst_dc/';
         else
             if AnalysisType == 0
                 DST_PATH = STD_PATH;

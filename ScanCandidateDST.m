@@ -5,15 +5,34 @@ function [thpel phpel mult radel rampel run coinc val] = ScanCandidateDST(Period
 % down = 0: only displays all selected events
 % down = -1: dispay selected==1 AND tag==1 events (Double selection)
 
-
+SharedGlobals;
+%     
 if ~exist('down')  
   down = 0;
 end
 
-SharedGlobals;
-%close all;
+%% Reads CandidateAnalysis selection results
+selectionfile = sprintf('selection_Period%d.txt',PeriodId);
+selectionfile = [CAND_PATH selectionfile];
+a = load(selectionfile);
+runid =  a(:,1);
 
-dstname = sprintf('Candidates_Period%d_102014.mat',PeriodId);
+% Number of surviving events after each cut
+nsurv = zeros(size(a(:,3:12)));
+for i = 1:size(a,1)
+    % Warning: up to row 7 [theta], figures are surviving events, after
+    % [n1..5] are removed events
+    nsurv(i,:) = [a(i,3:7) a(i,7)-cumsum(a(i,8:12))];
+%      a(i,:)
+%      nsurv(i,:)
+%      pause
+end
+% Now sum on all runs
+sumsurv = sum(nsurv,1);
+
+
+%% Load results DST
+dstname = sprintf('Candidates_Period%d.mat',PeriodId);
 dstname = [CAND_PATH dstname]; 
 if fopen(dstname)<0
     disp(sprintf('File %s not found. Abort.',dstname))
@@ -90,6 +109,7 @@ for i = 1:ncand
 %    if mdirnei(4,1)>0  % Hardest
 %    if mdirnei(1,5)>0  % Softest
     if mdirnei(3,2)>0  %Best 10mn + 33%
+%    if mdirnei(4,1)>0  
 %    if mdirnei(3,1)>1  %EW
 %    if mdirnei(3,2)>1  %NS
         %disp 'Skip 4.'
@@ -98,10 +118,10 @@ for i = 1:ncand
     end
     
     mnei = nei{i};
-%    if mnei(4,1)>0  % Hardest 
+%   if mnei(4,1)>0  % Hardest 
 %    if mnei(1,5)>0  %Softest
     if mnei(1,4)>0  %Best: 30s+66%
-%    if mnei(1,4)>0  %EW   30s+66%
+%    if mnei(2,3)>0  %EW   30s+66%
 %    if mnei(1,3)>0  %NS
         %disp 'Skip 5.'
         n5 = n5+1;
@@ -123,7 +143,7 @@ for i = 1:ncand
         end
     end    
     
-    disp 'Selected.'
+%    disp 'Selected.'
 %     if length(ants{i}) > maxmult
 %         maxmult = length(ants{i})
 %         ants{i}
@@ -132,10 +152,20 @@ for i = 1:ncand
     valid(i) = 1;
 end
 sel = find(valid==1);
-val = [ncand n1 n2 n6 n7 n3 n4 n5 n8 length(sel)]
-% ncand
-% 
-pause
+val = [ncand n1 n2 n6 n7 n3 n4 n5 n8 length(sel)];
+nsurv2 = [ncand ncand-cumsum(val(2:8))];
+% Display
+cuts = {'L>4','Radius','Chi2','Theta<80','Barycenter','BadSignals','Pattern','Directional Neighbours','Time neighbours'};
+display '*** Results of CandidatesAnalysis_v2 cuts ***'
+for i =1:length(sumsurv)-1
+    disp(sprintf('%s: %d events before --> %d after (%3.2f ratio)',cuts{i},sumsurv(i),sumsurv(i+1),sumsurv(i+1)./sumsurv(i)))  
+end
+display '*** Results of ScanCandidateDST cuts ***'
+cuts2 = {'BadPulses','Chi2','Radius','Amp','Theta','Dir neighbours','Time neighbours'};
+for i = 1:length(nsurv2)-1
+  disp(sprintf('%s: %d events before --> %d after (%3.2f ratio)',cuts2{i},nsurv2(i),nsurv2(i+1),nsurv2(i+1)./nsurv2(i)))  
+end
+
 
 %% Load CandidateTag.mat
 if fopen('CandidateTag.mat')>0
@@ -186,7 +216,7 @@ else
   sel = sel2;  
 end
 %
-disp(sprintf('%d candidates in DST, %d selected.',ncand,length(sel2)))
+disp(sprintf('***\n%d coincs, %d candidates in DSTs, %d selected (%3.1e & %3.1e ratio).',sumsurv(1),ncand,length(sel2),length(sel2)/sumsurv(1),length(sel2)/ncand))
 
 figure(1)
 subplot(2,1,1)
@@ -198,56 +228,42 @@ xlim([0 360])
 
 figure(2)
 PrepareSkyPlot(2);
+hold on
 polar( phip(sel2 )*DEG2RAD(1), thetap(sel2), 'go' );  
 
+%% Pack up returned variables
 thpel = thetap(sel);
 phpel = phip(sel);
 radel = radius(sel);
 rampel = ramp(sel);
 run = run(sel);
 coinc = coinc(sel);
-%thsel = thetas(sel2);
-%phsel = phis(sel2);
-% run(sel2)
-% coinc(sel2)
 
-n115 = 0;
-n137 = 0;
-n128 = 0;
-n112 = 0;
-
-mult = zeros(1,length(sel));
-for i=1:length(sel)
-  if run(i)<3650
-      continue
-  end
-  mult(i) = length(c.CandidateAntennas{1,sel(i)});
-  antsin = c.CandidateAntennas{1,sel(i)};
-  if size(find(antsin==137),2)==1
-      disp 'Antenna 137 in!'
-      n137 = n137+1;
-  end
-  if size(find(antsin==115),2)==1
-      disp 'Antenna 115 in!'
-      n115 = n115+1;
-  end
-  if size(find(antsin==128),2)==1
-      disp 'Antenna 128 in!'
-      n128 = n128+1;
-  end
-  if size(find(antsin==112),2)==1 
-      disp 'Antenna 112 in!'
-      n112 = n112+1;
-  end  
-end
-
-%pause
-% 
+% n115 = 0;
+% n137 = 0;
+% n128 = 0;
+% n112 = 0;
+% mult = zeros(1,length(sel));
 % for i=1:length(sel)
-%   CandidateTag(run(sel(i)),coinc(sel(i)))
+%   if run(i)<3650
+%       continue
+%   end
+%   mult(i) = length(c.CandidateAntennas{1,sel(i)});
+%   antsin = c.CandidateAntennas{1,sel(i)};
+%   if size(find(antsin==137),2)==1
+%       disp 'Antenna 137 in!'
+%       n137 = n137+1;
+%   end
+%   if size(find(antsin==115),2)==1
+%       disp 'Antenna 115 in!'
+%       n115 = n115+1;
+%   end
+%   if size(find(antsin==128),2)==1
+%       disp 'Antenna 128 in!'
+%       n128 = n128+1;
+%   end
+%   if size(find(antsin==112),2)==1 
+%       disp 'Antenna 112 in!'
+%       n112 = n112+1;
+%   end  
 % end
-
-[run' coinc']
-
-% figure(3)
-% hist(c.CandidateRadius(sel),100)
