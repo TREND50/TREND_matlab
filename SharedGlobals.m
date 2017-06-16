@@ -2,8 +2,11 @@ global C0 RAWDATA_PATH DST_PATH REFWE REFSN REFALT RAD2DEG DEG2RAD cutsettings l
 
 %addpath('/afs/in2p3.fr/throng/trend/soft/ana/matlab_tools/')
 
+%% Restrict to single thread.
+maxNumCompThreads(1)
+
 %% Data Challenge or not
-DC=0;
+DC=1;
 if DC == 1
   energy_eV = '';
 end
