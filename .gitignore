@@ -4,6 +4,7 @@ matlab_compil
 # Ignore binary data.
 *.bin
 DstBuilder
+DstBuilder_centos7
 
 # Ignore manual backups.
 *.old
