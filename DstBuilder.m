@@ -109,6 +109,8 @@ if CoincBuild
         display('Building Time Table...')
         [EventTimeTable,Struct]=EventTimeTableBuilder(Struct,TrigRateFilterFlag);
         display('Done!')
+        save('/afs/in2p3.fr/throng/trend/soft/ana/TREND_insertsimu/table.mat','EventTimeTable')
+
         if (Struct.Setup.TotalEvt-size(Struct.Setup.InfosRun.EmptySignals,1))==0
            display(sprintf('All events empty for run %d',nrun));
             filename = sprintf(coinc_filename,nrun,1);
@@ -269,8 +271,8 @@ if DstBuild
         [Struct]=CoinctableFileBuilder(Struct,0); 
         display('Done!')
         reconsex = [CXX_PATH 'recons'];
-        %unix(sprintf('export TREND_TEXT_PATH=%s;%s %d %d',TEXT_PATH,reconsex,nrun,CORREL));
-        unix(sprintf('setenv TREND_TEXT_PATH %s;%s %d %d',TEXT_PATH,reconsex,nrun,CORREL));
+        unix(sprintf('export TREND_TEXT_PATH=%s;%s %d %d',TEXT_PATH,reconsex,nrun,CORREL));
+        %unix(sprintf('setenv TREND_TEXT_PATH %s;%s %d %d',TEXT_PATH,reconsex,nrun,CORREL));
         [Struct]=ReconsLoader(Struct,0);
         [Struct]=Dist2Source(Struct); % distance antennas - point sources
         display('Launching CandidateFileBuilder...')
@@ -280,20 +282,20 @@ if DstBuild
         %reconsShowerex = [CXX_PATH 'reconsShower'];
         %%unix(sprintf('export TREND_TEXT_PATH=%s;%s %d %d %d',TEXT_PATH,reconsShowerex,nrun,CORREL,0));
         %unix(sprintf('setenv TREND_TEXT_PATH %s;%s %d %d %d',TEXT_PATH,reconsShowerex,nrun,CORREL, 0));
-        %[Struct]=ShowerLoader(Struct,0);
+        [Struct]=ShowerLoader(Struct,0);
         %%unix(sprintf('export TREND_TEXT_PATH=%s;%s %d %d %d',TEXT_PATH,reconsShowerex,nrun,CORREL,1));
         %unix(sprintf('setenv TREND_TEXT_PATH %s;%s %d %d %d',TEXT_PATH,reconsShowerex,nrun,CORREL,1));
-        %[Struct]=ShowerLoader(Struct,1);
+        [Struct]=ShowerLoader(Struct,1);
         
-        %display('Now reconstructing hybrid coincs only...')
-        %display('Launching CoinctableFileBuilder...')       
-        %[Struct]=CoinctableFileBuilder(Struct,1); 
-        %display('Done!')
+        display('Now reconstructing hybrid coincs only...')
+        display('Launching CoinctableFileBuilder...')       
+        [Struct]=CoinctableFileBuilder(Struct,1); 
+        display('Done!')
         %reconsScintex = [CXX_PATH 'reconsScint'];
         %unix(sprintf('export TREND_TEXT_PATH=%s;%s %d %d',TEXT_PATH,reconsScintex,nrun,CORREL));
         %unix(sprintf('setenv TREND_TEXT_PATH %s;%s %d %d',TEXT_PATH,reconsScintex,nrun,CORREL));
-        %[Struct]=ReconsLoader(Struct,1);        
-        %display('Done!')
+        [Struct]=ReconsLoader(Struct,1);        
+        display('Done!')
 
         % Recalculation for corrected delays       
         if 0
@@ -304,37 +306,38 @@ if DstBuild
  	   [Struct]=CoinctableFileBuilder(Struct,0);
  	   display('Done!')
  	   reconsex = [CXX_PATH 'recons'];
- 	   %unix(sprintf('export TREND_TEXT_PATH=%s;%s %d %d',TEXT_PATH,reconsex,nrun,CORREL));
- 	   unix(sprintf('setenv TREND_TEXT_PATH %s;%s %d %d',TEXT_PATH,reconsex,nrun,CORREL));
+ 	   unix(sprintf('export TREND_TEXT_PATH=%s;%s %d %d',TEXT_PATH,reconsex,nrun,CORREL));
+ 	   %unix(sprintf('setenv TREND_TEXT_PATH %s;%s %d %d',TEXT_PATH,reconsex,nrun,CORREL));
  	   [Struct]=ReconsLoader(Struct,0);
  	   [Struct]=Dist2Source(Struct); % distance antennas - point sources
  	   display('Launching CandidateFileBuilder...')
  	   [Struct]=CandidateFileBuilder(Struct);
  	   display('Done!')
  	   reconsShowerex = [CXX_PATH 'reconsShower'];
- 	   %unix(sprintf('export TREND_TEXT_PATH=%s;%s %d %d %d',TEXT_PATH,reconsShowerex,nrun,CORREL,0));
- 	   unix(sprintf('setenv TREND_TEXT_PATH %s;%s %d %d %d',TEXT_PATH,reconsShowerex,nrun,CORREL, 0));
+ 	   unix(sprintf('export TREND_TEXT_PATH=%s;%s %d %d %d',TEXT_PATH,reconsShowerex,nrun,CORREL,0));
+ 	   %unix(sprintf('setenv TREND_TEXT_PATH %s;%s %d %d %d',TEXT_PATH,reconsShowerex,nrun,CORREL, 0));
  	   [Struct]=ShowerLoader(Struct,0);
- 	   %unix(sprintf('export TREND_TEXT_PATH=%s;%s %d %d %d',TEXT_PATH,reconsShowerex,nrun,CORREL,1));
- 	   unix(sprintf('setenv TREND_TEXT_PATH %s;%s %d %d %d',TEXT_PATH,reconsShowerex,nrun,CORREL,1));
+ 	   unix(sprintf('export TREND_TEXT_PATH=%s;%s %d %d %d',TEXT_PATH,reconsShowerex,nrun,CORREL,1));
+ 	   %unix(sprintf('setenv TREND_TEXT_PATH %s;%s %d %d %d',TEXT_PATH,reconsShowerex,nrun,CORREL,1));
  	   [Struct]=ShowerLoader(Struct,1);
  
  	   display('Now reconstructing hybrid coincs only...')
  	   display('Launching CoinctableFileBuilder...')
  	   [Struct]=CoinctableFileBuilder(Struct,1);
  	   display('Done!')
- 	   reconsScintex = [CXX_PATH 'reconsScint'];
+ 	   %reconsScintex = [CXX_PATH 'reconsScint'];
  	   %unix(sprintf('export TREND_TEXT_PATH=%s;%s %d %d',TEXT_PATH,reconsScintex,nrun,CORREL));
- 	   unix(sprintf('setenv TREND_TEXT_PATH %s;%s %d %d',TEXT_PATH,reconsScintex,nrun,CORREL));
+ 	   %unix(sprintf('setenv TREND_TEXT_PATH %s;%s %d %d',TEXT_PATH,reconsScintex,nrun,CORREL));
  	   [Struct]=ReconsLoader(Struct,1);
  	   display('Done!')
         end
         
         % NO SCINT RECONS
-        %display('Now reconstructing pure scintillator coincs only...')
-        %[Struct]=SciOnlyRecons(Struct, AnalysisType);
+        display('Now reconstructing pure scintillator coincs only...')
+        [Struct]=SciOnlyRecons(Struct, AnalysisType);
         
         % Structure save       
+        %Struct.Coinc.IsShower=4
         filename =[DST_PATH sprintf(dst_filename,nrun,i)];
         save(filename,'Struct');
         display(sprintf('DST %s now saved to file.',filename));

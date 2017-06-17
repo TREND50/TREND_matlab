@@ -4,8 +4,8 @@ function [] = CandidateAnalysis_v2(nrun,dstf)
 % OMH 18/06/2013
 
 SharedGlobals;
-if nrun == 3202  
-  disp 'Skip R3202, too big'
+if nrun>= 3202  & nrun<= 3204
+  disp 'Skip R3202-4, too big'
   return
 end
 isSimu = 0;

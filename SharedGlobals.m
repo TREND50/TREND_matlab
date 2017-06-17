@@ -1,13 +1,14 @@
 global C0 RAWDATA_PATH DST_PATH REFWE REFSN REFALT RAD2DEG DEG2RAD cutsettings labelOpts;
 
-%addpath('../matlab_tools/')
+%addpath('/afs/in2p3.fr/throng/trend/soft/ana/matlab_tools/')
 
-CC=0;
+%% Restrict to single thread.
+maxNumCompThreads(1)
 
 %% Data Challenge or not
-DC=0;
+DC=1;
 if DC == 1
-  energy_eV = '5e17';
+  energy_eV = '';
 end
 %% General
 C0 = 2.99792458e8;  %m/s
@@ -149,6 +150,7 @@ size_event=1024; % bytes
 nbevent=1024; % 1024 events of 1024 bytes by loop in background run
 
 %% PATHS
+CC=1;
 if CC==0  % Local PCS, no environment variables defined
         RAWDATA_PATH = '../data/raw/';
         TEXT_PATH = './';
@@ -156,9 +158,9 @@ if CC==0  % Local PCS, no environment variables defined
         LOG_PATH = '../data/log/';
         MONITOR_PATH = '../data/monitor/';
         if DC
-            CAND_PATH = '../data/candidates/candidates_dc/';
+            CAND_PATH = '../data/candidates/candidates_dc/'
         else
-            CAND_PATH = '../data/candidates/sauv/candidates_dst102014/';
+            CAND_PATH = '../data/candidates/candidates_test/'
         end
         PSD_PATH = '../data/psd/';
         STD_PATH = '../data/dst/dst_std/dst102014/';
@@ -180,7 +182,6 @@ if CC==0  % Local PCS, no environment variables defined
         BCKGR_PATH = '../data/back/';
         BACKDST_PATH = '../data/back/';
         SELDATA_PATH = '../data/raw/';
-        CAL_PATH = '../data/cal/';
         SURVEY_PATH = RAWDATA_PATH;
         %SIMU_PATH = 'G:/data/simu/trend-50/1e17/';
         if HARD
@@ -227,9 +228,9 @@ else  % @CC
         end
     end
    if DC
-       CAND_PATH = '/sps/hep/trend/TREND_candidates/dc/'
+       CAND_PATH = '/sps/hep/trend/TREND_candidates/dc/';
    else
-       CAND_PATH =  '/sps/hep/trend/TREND_candidates/data/'
+       CAND_PATH =  '/sps/hep/trend/TREND_candidates/data/';
    end
     
     PSD_PATH = getenv( 'TREND_PSD_PATH' );
