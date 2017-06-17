@@ -55,6 +55,7 @@ if size(periodID,1)==0
     return
 end
 
+CAND_PATH = './'
 candname = [CAND_PATH sprintf('Candidates_Period%d.mat',periodID)];
 disp(sprintf('Now loading DST %s...',candname))
 
@@ -132,7 +133,7 @@ end;
 
 %% Loop on sub dsts
 meta = 1;
-filename = [CAND_PATH sprintf('selection_%d.txt',periodID)];
+filename = [CAND_PATH sprintf('selection_Period%d.txt',periodID)];
 
 while meta<=nbiter
 

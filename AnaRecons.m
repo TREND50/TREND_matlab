@@ -86,7 +86,7 @@ else
     %sel = find(mult'>=6 & time'<6.5 & time'>1.3 & phis<150 & thetas<78 & thetap<78 & abs(d)<5 & r'>2000  & chi2<50 & abs(slope-1)<0.1); %Track R256104
     %sel = find(mult'>=6 & time'<375 & time'>355 & phis<100 & thetas<78 & thetap<78 & abs(d)<5 & r'>2000  & chi2<50 & abs(slope-1)<0.1); %Track R3036
     %sel = find(mult'>=6 & time'<941 & time'>935 & phis<200 & thetas<78 & thetap<78 & abs(d)<5 & r'>2000  & chi2<50 & abs(slope-1)<0.1); %Track R3039  
-    sel = find(mult>=6 & chi2'<50 & abs(slope'-1)<0.1 & xs'>1400 & xs'<1600 & ys'<0 & ys'>-400);  % transfo HV
+    %sel = find(mult>=6 & chi2'<50 & abs(slope'-1)<0.1 & xs'>1400 & xs'<1600 & ys'<0 & ys'>-400);  % transfo HV
     %sel = find(mult>=6 & chi2'<50 & abs(slope'-1)<0.1 & xs'>1600 & xs'<1850 & ys'<700 & ys'>300 & time>1160);  % trace R3041
 end
 
