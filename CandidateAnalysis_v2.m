@@ -55,7 +55,7 @@ if size(periodID,1)==0
     return
 end
 
-candname = [CAND_PATH sprintf('Candidates_Period%d.mat',periodID)];
+candname = [CAND_PATH sprintf('Candidates_Period%d_L4.mat',periodID)];
 disp(sprintf('Now loading DST %s...',candname))
 
 if fopen(candname)>0
@@ -132,7 +132,7 @@ end;
 
 %% Loop on sub dsts
 meta = 1;
-filename = [CAND_PATH sprintf('selection_Period%d.txt',periodID)];
+filename = [CAND_PATH sprintf('selection_Period%d_L4.txt',periodID)];
 
 while meta<=nbiter
 
@@ -242,8 +242,8 @@ while meta<=nbiter
         nthetagood = length(find(thetar<cutsettings.ThetaCut));
         disp(sprintf('With theta*<%d deg:%d ',cutsettings.ThetaCut,nthetagood))
     end
-    sel = find(mult>4);
-    disp(sprintf('With L>4: %d',length(sel)))
+    sel = find(mult>3);
+    disp(sprintf('With L>3: %d',length(sel)))
     res = [ncoincs length(sel)];
     %sel = intersect(sel,find(chi2s<cutsettings.Chi2sCut & abs(slopes-1)<1.1));
     %disp(sprintf('With valid spherical recons: %d',length(sel)))

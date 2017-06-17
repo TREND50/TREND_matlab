@@ -6,7 +6,7 @@ global C0 RAWDATA_PATH DST_PATH REFWE REFSN REFALT RAD2DEG DEG2RAD cutsettings l
 maxNumCompThreads(1)
 
 %% Data Challenge or not
-DC=1;
+DC=0;
 if DC == 1
   energy_eV = '';
 end
