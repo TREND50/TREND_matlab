@@ -164,6 +164,8 @@ if CC==0  % Local PCS, no environment variables defined
         end
         PSD_PATH = '../data/psd/';
         STD_PATH = '../data/dst/dst_std/dst102014/';
+        STD_PATH = '../data/dst/dst_std/dst102012/';
+        
         HYB_PATH = '../data/dst/dst_hyb/';
         SCI_PATH = '../data/dst/dst_scint/';
         if DC 

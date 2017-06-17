@@ -109,7 +109,7 @@ sum(w)
 
 %% Plots
 figure(1)
-subplot(1,1,1)
+subplot(2,1,1)
 errorbar(E/1e18/err_coef,expo,expoerr,'+-b','LineWidth',2)
 %plot(E/1e18/err_coef,expo,'+-b','LineWidth',3)
 grid on
@@ -126,17 +126,18 @@ plot(x/1e18,yerf,'m','LineWidth',3)
 
 xlabel('Energy [EeV]',labelOpts{:})
 ylabel('Apperture [m^2.sr]',labelOpts{:})
-%title('TREND exposure', labelOpts{:})
-% subplot(2,1,2)
-% semilogx(E/1e18,expo,'+-b','LineWidth',2)
-% grid on
-% hold on
-% xlim([0.05 3.1])
-% semilogx(Ecuts/1e18,expocuts,'+-k','LineWidth',2)
-% semilogx(Eideal/1e18,expoideal,'+-g','LineWidth',2)
-% %semilogx(x/1e18,y,'r','LineWidth',2)
-% xlabel('Energy [EeV]',labelOpts{:})
-% ylabel('Apperture [m^2.sr]',labelOpts{:})
+%title('TREND apperture', labelOpts{:})
+subplot(2,1,2)
+semilogx(E/1e18,expo,'+-b','LineWidth',2)
+grid on
+hold on
+xlim([0.05 3.1])
+semilogx(Ecuts/1e18,expocuts,'+-k','LineWidth',2)
+semilogx(Eideal/1e18,expoideal,'+-g','LineWidth',2)
+semilogx(x/1e18,yerf,'m','LineWidth',3)
+%semilogx(x/1e18,y,'r','LineWidth',2)
+xlabel('Energy [EeV]',labelOpts{:})
+ylabel('Apperture [m^2.sr]',labelOpts{:})
 
 % figure(2)
 % semilogx(E/1e18/err_coef,r,'+-b','LineWidth',2)

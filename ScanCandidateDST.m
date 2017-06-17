@@ -12,6 +12,7 @@ if ~exist('down')
 end
 
 %% Reads CandidateAnalysis selection results
+%selectionfile = sprintf('selection_Period%d_L4.txt',PeriodId);
 selectionfile = sprintf('selection_Period%d.txt',PeriodId);
 selectionfile = [CAND_PATH selectionfile];
 a = load(selectionfile);
@@ -31,7 +32,10 @@ end
 sumsurv = sum(nsurv,1);
 
 
+badruns=[4212 4218 4271 4290 4306 4333 4352 4360]
+
 %% Load results DST
+%dstname = sprintf('Candidates_Period%d_L4.mat',PeriodId);
 dstname = sprintf('Candidates_Period%d.mat',PeriodId);
 dstname = [CAND_PATH dstname]; 
 if fopen(dstname)<0
@@ -62,7 +66,7 @@ bad = c.CandidateBadAnt;
 radius = c.CandidateRadius;
 ramp = c.CandidateRatioAmp;
 valid = zeros(1,ncand);
-maxmult = 0;
+minmult = 6;
 n1 = 0;
 n2 = 0;
 n3 = 0;
@@ -73,7 +77,15 @@ n7 = 0;
 n8 = 0;
 
 for i = 1:ncand
+%     if sum(ismember(badruns,run(i)))>0
+%         continue
+%     end
     %disp(sprintf('R%dC%d',run(i),coinc(i)))
+    
+    mult = length(c.CandidateAntennas{i});
+    if mult<minmult
+        continue
+    end
     if bad(i)>0
         %disp 'Skip 1.'
         n1 = n1+1;
@@ -108,11 +120,8 @@ for i = 1:ncand
     mdirnei = dirnei{i};
 %    if mdirnei(4,1)>0  % Hardest
 %    if mdirnei(1,5)>0  % Softest
-    if mdirnei(3,2)>0  %Best 10mn + 33%
-%    if mdirnei(4,1)>0  
-%    if mdirnei(3,1)>1  %EW
-%    if mdirnei(3,2)>1  %NS
-        %disp 'Skip 4.'
+    if mdirnei(3,2)>0  %Best 20mn + 33% mdirnei(3,2)>0
+       %disp 'Skip 4.'
         n4 = n4+1;
         continue
     end
@@ -120,9 +129,8 @@ for i = 1:ncand
     mnei = nei{i};
 %   if mnei(4,1)>0  % Hardest 
 %    if mnei(1,5)>0  %Softest
-    if mnei(1,4)>0  %Best: 30s+66%
-%    if mnei(2,3)>0  %EW   30s+66%
-%    if mnei(1,3)>0  %NS
+    if mnei(3,3)>1  %Best: 2mn+50% mnei(3.3)>0   ==> ab2.ttx
+%    if mnei(1,4)>0  %Best: 30s+66% mnei(1,4)>0  ==> ab.txt 
         %disp 'Skip 5.'
         n5 = n5+1;
         continue
@@ -155,15 +163,15 @@ sel = find(valid==1);
 val = [ncand n1 n2 n6 n7 n3 n4 n5 n8 length(sel)];
 nsurv2 = [ncand ncand-cumsum(val(2:8))];
 % Display
-cuts = {'L>4','Radius','Chi2','Theta<80','Barycenter','BadSignals','Pattern','Directional Neighbours','Time neighbours'};
+cuts = {'L>4','Radius','Chi2','Theta<80','Barycenter','BadSignals','Pattern','Dir neighbours','Time neighbours'};
 display '*** Results of CandidatesAnalysis_v2 cuts ***'
 for i =1:length(sumsurv)-1
-    disp(sprintf('%s: %d events before --> %d after (%3.2f ratio)',cuts{i},sumsurv(i),sumsurv(i+1),sumsurv(i+1)./sumsurv(i)))  
+    disp(sprintf('%s: %d coincs before --> %d after (%3.2f ratio)',cuts{i},sumsurv(i),sumsurv(i+1),sumsurv(i+1)./sumsurv(i)))  
 end
 display '*** Results of ScanCandidateDST cuts ***'
 cuts2 = {'BadPulses','Chi2','Radius','Amp','Theta','Dir neighbours','Time neighbours'};
 for i = 1:length(nsurv2)-1
-  disp(sprintf('%s: %d events before --> %d after (%3.2f ratio)',cuts2{i},nsurv2(i),nsurv2(i+1),nsurv2(i+1)./nsurv2(i)))  
+  disp(sprintf('%s: %d coincs before --> %d after (%3.2f ratio)',cuts2{i},nsurv2(i),nsurv2(i+1),nsurv2(i+1)./nsurv2(i)))  
 end
 
 
@@ -238,17 +246,17 @@ radel = radius(sel);
 rampel = ramp(sel);
 run = run(sel);
 coinc = coinc(sel);
-
-% n115 = 0;
+mult = zeros(1,length(sel));
+for i=1:length(sel)
+  if run(i)<3650
+      continue
+  end
+  mult(i) = length(c.CandidateAntennas{1,sel(i)});
+end
+  % n115 = 0;
 % n137 = 0;
 % n128 = 0;
 % n112 = 0;
-% mult = zeros(1,length(sel));
-% for i=1:length(sel)
-%   if run(i)<3650
-%       continue
-%   end
-%   mult(i) = length(c.CandidateAntennas{1,sel(i)});
 %   antsin = c.CandidateAntennas{1,sel(i)};
 %   if size(find(antsin==137),2)==1
 %       disp 'Antenna 137 in!'

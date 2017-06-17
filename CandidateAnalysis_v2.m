@@ -55,7 +55,9 @@ if size(periodID,1)==0
     return
 end
 
-candname = [CAND_PATH sprintf('Candidates_Period%d_L4.mat',periodID)];
+%candname = [CAND_PATH sprintf('Candidates_Period%d_L4.mat',periodID)];
+%CAND_PATH = './'
+candname = [CAND_PATH sprintf('Candidates_Period%d.mat',periodID)];
 disp(sprintf('Now loading DST %s...',candname))
 
 if fopen(candname)>0
