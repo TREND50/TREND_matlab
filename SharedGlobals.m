@@ -158,7 +158,6 @@ if CC==0  % Local PCS, no environment variables defined
         LOG_PATH = '../data/log/';
         MONITOR_PATH = '../data/monitor/';
         if DC
-<<<<<<< HEAD
             CAND_PATH = '../TREND/data/candidates/candidates_dc/'
         else
             CAND_PATH = '../TREND/data/candidates_dst102014/'
@@ -167,19 +166,6 @@ if CC==0  % Local PCS, no environment variables defined
         STD_PATH = '../TREND/data/dst/dst_std/dst102014/';
         HYB_PATH = '../TREND/data/dst/dst_hyb/';
         SCI_PATH = '../TREND/data/dst/dst_scint/';
-=======
-            CAND_PATH = '../data/candidates/candidates_dc/';
-        else
-            CAND_PATH = '../data/candidates/sauv/candidates_dst102014/';
-        end
-        CAND_PATH
-        PSD_PATH = '../data/psd/';
-        STD_PATH = '../data/dst/dst_std/dst102014/';
-        %STD_PATH = '../data/dst/dst_std/dst102012/';
-        
-        HYB_PATH = '../data/dst/dst_hyb/';
-        SCI_PATH = '../data/dst/dst_scint/';
->>>>>>> 9887a1b9529ee85daae9cd3176891c4ea6bd96c7
         if DC 
             DST_PATH = '../data/dst/dst_dc/';
         else
