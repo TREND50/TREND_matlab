@@ -87,10 +87,10 @@ hold on
 grid on
 
 %% Load relief map
-%[x,y,z] = getMap('map.bin',[xmin,xmax,ymin,ymax]);
-%contourf(x,y,z,40)
-%colormap bone
-%colorbar
+[x,y,z] = getMap('map.bin',[xmin,xmax,ymin,ymax]);
+contourf(x,y,z,40)
+colormap bone
+colorbar
 %axis equal
 
 %% Pods:
@@ -114,10 +114,10 @@ end
 %% Detectors
 for i = 1:length( Detectors )
     if isScint(i)==1
-        plot( xpos_ant(i), ypos_ant(i), 'sr', 'MarkerSize', 8, 'MarkerFaceColor','r' );  %Ground view
-        text( xpos_ant(i)+20, ypos_ant(i), num2str( Detectors(i) ), 'FontSize', 12, 'FontWeight', 'bold','Color','r' );
+        %plot( xpos_ant(i), ypos_ant(i), 'sr', 'MarkerSize', 8, 'MarkerFaceColor','r' );  %Ground view
+        %text( xpos_ant(i)+20, ypos_ant(i), num2str( Detectors(i) ), 'FontSize', 12, 'FontWeight', 'bold','Color','r' );
     else
         plot( xpos_ant(i), ypos_ant(i), '^k', 'MarkerSize', 8, 'MarkerFaceColor','y' );  %Ground view
-        text( xpos_ant(i)+20, ypos_ant(i), num2str( Detectors(i) ), 'FontSize', 12, 'FontWeight', 'bold','Color','k' );
+        text( xpos_ant(i)+20, ypos_ant(i), num2str( Detectors(i) ), 'FontSize', 12, 'FontWeight', 'bold','Color','w' );
     end
 end

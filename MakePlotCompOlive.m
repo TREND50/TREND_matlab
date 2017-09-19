@@ -4,33 +4,33 @@ SharedGlobals;
 
 TXTPATH = '../data/candidates/candidates_dc';
 
-E={'8e16','1e17','2e17','3e17','5e17','7e17','1e18','3e18'}
-%wini = [ 28.2476   46.4490   39.2201   38.2236   31.5862   17.4193   13.0303    1.2840] % erf fit
-%wini = [24.9828   39.3586   31.1448   29.4424   25.9159   16.2594   12.9954    1.2840];  %erf fit 10% E bias
-%wini = [23.4766   36.1732   27.6280   25.5481   23.0133   15.4282   12.9495    1.2840]; %erf fit 15% error
-wini = [22.0498   33.2111   24.4344   21.9977   20.1427   14.4137   12.8653  1.2840];  %erf fit 20% E bias
-%wini = [13.0991   63.3256   71.0977   54.2467   30.8900   17.7835   13.5920  1.4494];  %lin fit
-%wini = [4.0250   44.3261   56.9189   45.6331   26.8680   16.1121   13.4927  1.4275];  % lin fit 10% Ebias
-%wini = [0.0629   27.3740   43.9641   36.6492   23.0950   13.7707   13.3786    1.4056];  % lin fit 20% Ebias
-%wini = [28.2476   46.4490   39.2201   38.2236   31.5862   17.4193   13.0303    1.2840];  % erf fit 
-%wini = [23.4766   36.1732   27.6280   25.5481   23.0133   15.4282   12.9495    1.2840];  % erf fit 15% Ebias
+E={'7e16','8e16','1e17','2e17','3e17','5e17','7e17','1e18','2e18','3e18'}
+%wini = [4.3805   11.6370   35.0830   44.7381   57.8327   43.9752   19.0686   11.3971    2.9258    0.4473] % erf fit
+%wini = [3.1023    7.9324   21.3440   23.2440   30.2880   30.7937   18.0414 11.3921    2.9258    0.4473];  %erf fit (f=0.8)
+wini = [0    1.4767   16.1715   31.1369   33.2288   23.2604   13.3545   10.8791    3.3457    0.5215]; %multivariate fit f=0.75
+%wini = [0    3.0378   20.9780   37.7414   38.0718   25.5232   14.1998 11.2469   3.3716    0.5197] %multivariate fit f=0.8
+%wini = [1.6181    6.9699   40.1474   60.6394   52.9439   31.7979   16.3448   12.0796    3.4063    0.5122] %multivariate fit f=0.95
+%wini = [2.3371   11.9533   63.3876   70.6742   54.0201   30.6391   18.5805   11.7129    3.3851    0.5076];  %lin fit
+%wini = [0       0   28.0629   43.7333   36.5441   22.8290   13.9559   11.6511    3.2201    0.5312];  % lin fit 20% Ebias
 
 
 %% Get DataChallenge results
 for i = 1:length(E)
   selfile=load(sprintf('%s/%s/log_candanalysisend.txt',TXTPATH,E{i}), 'r' );
-  out = find(selfile(:,2)>75 & selfile(:,3)<=350 & selfile(:,3)>=250);  % reject trajectories below hiron (theta >75° at SOuth)
+  tag = find(selfile(:,end)==1);  % Valid showers
+  selfile = selfile(tag,:);
+  out = find(selfile(:,2)>70 & selfile(:,3)<=350 & selfile(:,3)>=250);  % reject trajectories below hiron (theta >75° at SOuth)
   %out = [];
-  disp(sprintf('E=%seV: killing %d/%d events below horizon',E{i},length(out),size(selfile,1)))
-  in = setxor([1:size(selfile,1)],out);
-  w(i) = wini(i)*length(in)/size(selfile,1);
+  disp(sprintf('E=%seV: killing %d/%d events below horizon',E{i},length(out),size(tag,1)))
+  in = setxor([1:length(tag)],out);
+  w(i) = wini(i)*length(in)/length(tag);
   % Load valid trajectories
   theta=selfile(in,2);
-  phi=mod(selfile(in,3)-90,360);
-  tag=selfile(in,33);
+  phi=mod(selfile(in,3)+phigeom-90,360);
+  %tag=selfile(in,33);
   % Compute zen & az hists for each energy slice
-  [count_theta(i,:),center_theta(i,:)]=hist(theta(tag==1),[5:10:85]);
-  [count_phi(i,:),center_phi(i,:)]=hist(phi(tag==1),[20:40:340]);
+  [count_theta(i,:),center_theta(i,:)]=hist(theta,[5:10:85]);
+  [count_phi(i,:),center_phi(i,:)]=hist(phi,[20:40:340]);
   % Apply weigth fpr each E
   cth(i,:) = count_theta(i,:)./sum(count_theta(i,:))*w(i);
   cph(i,:) = count_phi(i,:)./sum(count_phi(i,:))*w(i);
@@ -49,10 +49,11 @@ count_phi_error = sqrt(count_phi);
 count_phi_error = count_phi_error*totevt/sum(count_phi);
 
 %% Now load experimental data
-%selfile=load(sprintf('Candidates_all.txt'), 'r' );  % All periods
-%selfile=load(sprintf('ab.txt'), 'r' );  % All periods
-selfile=load(sprintf('ab2.txt'), 'r' );  % All periods  
-%selfile=load(sprintf('Candidates_Period6.txt'), 'r' );  % All periods
+selfile=load(sprintf('Candidates_all.txt'), 'r' );  % All periods
+%selfile=load(sprintf('ab.txt'), 'r' );  % All periods   Mult 5 & soft cuts
+%selfile=load(sprintf('ab2.txt'), 'r' );  % All periods  Mult 6 & hard cuts
+%selfile=load(sprintf('ab3.txt'), 'r' );  % All periods  Mult 5 & hard cuts
+%selfile=load(sprintf('Candidates_Period6.txt'), 'r' );  % Period 6
 theta=selfile(:,1);
 %phi=mod(selfile(:,2)+90-phigeom,360);   % North is Magnetic North in Zhaires
 phi=mod(selfile(:,2)-phigeom,360);   % North is Magnetic North in Zhaires

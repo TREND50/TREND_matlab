@@ -32,7 +32,8 @@ end
 sumsurv = sum(nsurv,1);
 
 
-badruns=[4212 4218 4271 4290 4306 4333 4352 4360]
+%badruns=[4212 4218 4271 4290 4306 4333 4352 4360]
+badruns=[];
 
 %% Load results DST
 %dstname = sprintf('Candidates_Period%d_L4.mat',PeriodId);
@@ -66,7 +67,7 @@ bad = c.CandidateBadAnt;
 radius = c.CandidateRadius;
 ramp = c.CandidateRatioAmp;
 valid = zeros(1,ncand);
-minmult = 6;
+minmult = 5;
 n1 = 0;
 n2 = 0;
 n3 = 0;
@@ -89,25 +90,25 @@ for i = 1:ncand
     if bad(i)>0
         %disp 'Skip 1.'
         n1 = n1+1;
-        continue
+        %continue
     end
     
     if chi2p(i)>30
         %disp 'Skip 2.'
         n2 = n2+1;
-        continue
+        %continue
     end
         
     if radius(i)<3000
         %disp 'Skip 6.'
         n6 = n6+1;
-        continue
+        %continue
     end
     
     if ramp(i)<1
         %disp 'Skip 7.'
         n7 = n7+1;
-        continue
+        %continue
     end
     
     if thetap(i)>80 | thetap(i)<0
@@ -129,11 +130,11 @@ for i = 1:ncand
     mnei = nei{i};
 %   if mnei(4,1)>0  % Hardest 
 %    if mnei(1,5)>0  %Softest
-    if mnei(3,3)>1  %Best: 2mn+50% mnei(3.3)>0   ==> ab2.ttx
-%    if mnei(1,4)>0  %Best: 30s+66% mnei(1,4)>0  ==> ab.txt 
+%    if mnei(3,3)>1  %Best: 2mn+50% mnei(3,3)>0   ==> ab2.ttx
+    if mnei(1,4)>0  %Best: 30s+66% mnei(1,4)>0  ==> ab.txt 
         %disp 'Skip 5.'
         n5 = n5+1;
-        continue
+        %continue
     end
     
     if PeriodId>=9
@@ -173,7 +174,9 @@ cuts2 = {'BadPulses','Chi2','Radius','Amp','Theta','Dir neighbours','Time neighb
 for i = 1:length(nsurv2)-1
   disp(sprintf('%s: %d coincs before --> %d after (%3.2f ratio)',cuts2{i},nsurv2(i),nsurv2(i+1),nsurv2(i+1)./nsurv2(i)))  
 end
-
+% sumsurv'
+% nsurv2'
+% pause
 
 %% Load CandidateTag.mat
 if fopen('CandidateTag.mat')>0
