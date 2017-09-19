@@ -39,15 +39,19 @@ function data = ReadPSD1( nrun, antenna, NPAR )
   SharedGlobals;
   N         = NFFT + NPAR;
 
+
   % Read data
   %===
   strfile = [PSD_PATH sprintf('R%06d/R%06d_A%04d_PSD_data.bin',nrun,nrun,antenna)];
+  %strfile = [PSD_PATH sprintf('R%06d_A%04d_PSD_data.bin',nrun,antenna)];
   fid = fopen( strfile );
+  
   if fid < 0  %Old format
      %disp(sprintf( 'Error in READ_PSD\n could not find file %s', strfile ) )
      strfile = [PSD_PATH sprintf('PSD%05d_%d_data.bin', nrun, antenna )];
      fid = fopen( strfile );
-  end  
+  end
+  
   if fid <= 0
     data = [];
     %disp( sprintf( 'Error in READ_PSD\n could not find file %s', strfile ) );
@@ -55,6 +59,7 @@ function data = ReadPSD1( nrun, antenna, NPAR )
   end
   d = fread( fid, inf, 'float32' );
   fclose( fid );
+  
 %size(d)
 %size(N)
   d = reshape( d, N, [] );
@@ -73,6 +78,7 @@ function data = ReadPSD1( nrun, antenna, NPAR )
   % Read time
   %===
   strfile = [PSD_PATH sprintf('R%06d/R%06d_A%04d_PSD_time.bin',nrun, nrun, antenna )];
+  %strfile = [PSD_PATH sprintf('R%06d_A%04d_PSD_time.bin', nrun, antenna )];
   fid = fopen( strfile );
   if fid < 0  %Old format
      strfile = [PSD_PATH sprintf('PSD%05d_%d_time.bin', nrun, antenna )];
@@ -101,13 +107,13 @@ function data = ReadPSD1( nrun, antenna, NPAR )
       sig = sig( 1:nmin );
     end
   end
- 
+  
   % Pack results
   %===
   data.id = antenna;
   data.psd   = P;
   data.f     = F;
-  data.t     = T;
+  data.t     = T;  % time in seconds
   data.tdeb  = Tdeb; 
   data.flag  = flg;
   data.mu    = mu;

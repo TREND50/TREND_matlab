@@ -22,7 +22,7 @@ for i=1:length(dets)
         %% Antennas  
         case 1   % Former B4 ==> now A127 AERA electronics
             pos_det(i,:)=[19.0	441.9	2634.0];
-            podN(i,:) = [151, 151, 151];
+            podN(i,:) = [151, 151, 151];  %S11
             if nrun>7120
                 machines(i,:) = [128, 131, 132]; % Since April 2016
             else
@@ -35,7 +35,7 @@ for i=1:length(dets)
         case 2% C5
             pos_det(i,:) = [152.8,466.3,2633.6];
             %pos_ant(i,:)=[147, 461, 2640];  Prelim meas.
-            podN(i,:) = [150, 150, 150];
+            podN(i,:) = [150, 150, 150];   %S10
             machines(i,:) = [134,135,136];
             cable(i,:) = [122, 124, 121]; %R6899, 6902, 6903
             fiberdelay(i,:) = [-99, -99 , -99]; %R6886, 6888, 6889  

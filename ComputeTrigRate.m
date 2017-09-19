@@ -1,11 +1,10 @@
-function [] = ComputeTrigRate(runid)
+function [] = computeTrigRate(runid)
 % Loads RUNID dst and reads trigger rate
 % Inserts in in total_trigrate and writes to trigrate.mat
-% Also records 
 % OMH 27/05/2013
 
 SharedGlobals;
-DISPLAY = 0;
+DISPLAY = 1;
 
 %% Load structure
 filename = ([MONITOR_PATH 'trigrate.mat']);
@@ -38,7 +37,7 @@ if sum(ismember(runs,runid))>0
 else
     disp(sprintf('Now processing run %d... ',runid))
     %% Read dst
-    dstname = [DST_PATH sprintf(dst_filename,runid,1)];
+    dstname = [DST_PATH sprintf(dst_filename,runid,1)];  % Only needed to read 1st dst, as we load Setup substruct only
     fid2 = fopen(dstname);
     if fid2<0
         disp(sprintf('dst %s not found.',dstname))
@@ -47,16 +46,6 @@ else
         disp(sprintf('Loading dst %s...',dstname))
         dst = load(dstname);
         disp 'Done.'
-%         [dur idur] = max(dst.Struct.Setup.InfosRun.TimeStop-dst.Struct.Setup.InfosRun.TimeStart);
-%         dur= dur/60;
-%         vstart = dst.Struct.Setup.InfosRun.TimeStart;
-%         goodtime = find(max(vstart)-vstart<1e3 & vstart>0);  % Valid timing
-%         tstart = min(vstart(goodtime));
-%         tstop = max(dst.Struct.Setup.InfosRun.TimeStop(goodtime));
-%         [yi, mi, di, hi, mni, si] = unixsecs2date(tstart);
-%         if yi<2010
-%             disp(sprintf('Error! Date of start = %02d/%02d/%d',di,mi,yi))
-%         end
         t = dst.Struct.Setup.InfosRun.TrigTime; %[s]
         if size(t,1) == 0
             disp 'No trigger rate measurment! Abort.'
@@ -134,24 +123,15 @@ else
         run.ntf = ntf;
         run.detcrate = detratec;
         run.detnbt1 = detnbt1;      
-        %
         allruns{end+1} = run;
         %
         if fid>0   %trigrate.mat exists
           [a ind] = min(abs(unixs-th(1)));
           unixs = [unixs(1:ind-1) th unixs(ind:end)];
           rate = [rate(1:ind-1) coincrateh rate(ind:end)];
-          %trate(:,end+1:end+size(t0rateh,1)) = zeros(length(ALLDETS),size(t0rateh,1));
-          %newtrate = zeros(length(ALLDETS),size(trate,2)+size(t0rateh,2));
           for j = 1:length(ALLDETS)
-            %indd = find(ALLDETS==dets(j));  
-            %if size(indd,2)>0
               newcol = [trate(j,1:ind-1) t0rateh(j,:) trate(j,ind:end)];
-              newtrate(j,1:length(newcol)) = newcol;
-%             else
-%               newcol = [trate(indd,1:ind-1) t0rateh(j,:) trate(indd,ind:end)];
-%            end
-            
+              newtrate(j,1:length(newcol)) = newcol;            
           end
           trate = newtrate;
         else   %trigrate.mat does not exist

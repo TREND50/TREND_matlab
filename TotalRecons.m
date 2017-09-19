@@ -73,7 +73,7 @@ for i=runstart:runstop
 
         %% Load dst
         NEvt = d.Struct.Setup.TotalEvt;
-        NCoincRaw = sum(d.Struct.Setup.InfosRun.MetaTotalCoinc);
+        NCoincRaw = sum(d.Struct.Setup.InfosRun.MetaTotalCoinc);   %Same info for ALL subDSTs in same run
         NCoinc_ConsCoinc = sum(d.Struct.Setup.InfosRun.TotalCoincFiltered1);
         NCoinc_BadPulses = d.Struct.Setup.TotalCoinc;
         Mult = d.Struct.Coinc.MultAnt';
