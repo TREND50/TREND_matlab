@@ -109,7 +109,7 @@ ylabel('log10(Radius) [m]', labelOpts{:})
 
 %pause
 figure(4)
-PrepareSkyPlot(4);
+prepareSkyplot(4);
 h = polar( phtot*DEG2RAD(1), thtot, 'k*');
 set(h, 'MarkerFaceColor', 'g' );  
 SmoothSkyplot(thtot,phtot);

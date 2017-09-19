@@ -90,25 +90,25 @@ for i = 1:ncand
     if bad(i)>0
         %disp 'Skip 1.'
         n1 = n1+1;
-        %continue
+        continue
     end
     
     if chi2p(i)>30
         %disp 'Skip 2.'
         n2 = n2+1;
-        %continue
+        continue
     end
         
     if radius(i)<3000
         %disp 'Skip 6.'
         n6 = n6+1;
-        %continue
+        continue
     end
     
     if ramp(i)<1
         %disp 'Skip 7.'
         n7 = n7+1;
-        %continue
+        continue
     end
     
     if thetap(i)>80 | thetap(i)<0
@@ -134,7 +134,7 @@ for i = 1:ncand
     if mnei(1,4)>0  %Best: 30s+66% mnei(1,4)>0  ==> ab.txt 
         %disp 'Skip 5.'
         n5 = n5+1;
-        %continue
+        continue
     end
     
     if PeriodId>=9
@@ -238,7 +238,7 @@ hist(phip(sel2),40)
 xlim([0 360])
 
 figure(2)
-PrepareSkyPlot(2);
+prepareSkyplot(2);
 hold on
 polar( phip(sel2 )*DEG2RAD(1), thetap(sel2), 'go' );  
 
