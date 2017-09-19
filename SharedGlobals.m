@@ -6,7 +6,7 @@ global C0 RAWDATA_PATH DST_PATH REFWE REFSN REFALT RAD2DEG DEG2RAD cutsettings l
 maxNumCompThreads(1)
 
 %% Data Challenge or not
-DC=1;
+DC=0;
 if DC == 1
   energy_eV = '';
 end
@@ -150,7 +150,7 @@ size_event=1024; % bytes
 nbevent=1024; % 1024 events of 1024 bytes by loop in background run
 
 %% PATHS
-CC=1;
+CC=0;
 if CC==0  % Local PCS, no environment variables defined
         RAWDATA_PATH = '../data/raw/';
         TEXT_PATH = './';
@@ -158,16 +158,14 @@ if CC==0  % Local PCS, no environment variables defined
         LOG_PATH = '../data/log/';
         MONITOR_PATH = '../data/monitor/';
         if DC
-            CAND_PATH = '../data/candidates/candidates_dc/'
+            CAND_PATH = '../TREND/data/candidates/candidates_dc/'
         else
-            CAND_PATH = '../data/candidates/candidates_test/'
+            CAND_PATH = '../TREND/data/candidates_dst102014/'
         end
-        PSD_PATH = '../data/psd/';
-        STD_PATH = '../data/dst/dst_std/dst102014/';
-        STD_PATH = '../data/dst/dst_std/dst102012/';
-        
-        HYB_PATH = '../data/dst/dst_hyb/';
-        SCI_PATH = '../data/dst/dst_scint/';
+        PSD_PATH = '../TREND/data/psd/';
+        STD_PATH = '../TREND/data/dst/dst_std/dst102014/';
+        HYB_PATH = '../TREND/data/dst/dst_hyb/';
+        SCI_PATH = '../TREND/data/dst/dst_scint/';
         if DC 
             DST_PATH = '../data/dst/dst_dc/';
         else
