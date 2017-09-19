@@ -105,14 +105,14 @@ disp(sprintf('All periods: %3.1e raw coincs, %3.1e after ConsCoinc; %3.1e after 
 
 figure(39)
 subplot(2,2,1)
-errorBar([pstart:pstop],rawRate,eRawRate,'sk','MarkerSize',8,'MarkerFaceColor','k')
+errorbar([pstart:pstop],rawRate,eRawRate,'sk','MarkerSize',8,'MarkerFaceColor','k')
 xlabel('Period ID', labelOpts{:})
 ylabel('Mean raw coinc rate [Hz]', labelOpts{:})
 hold on
 grid on
 % errorBar([pstart:pstop],selRate,eSelRate,'sr','MarkerSize',8,'MarkerFaceColor','r')
 subplot(2,2,3)
-errorBar([pstart:pstop],candRate,eCandRate,'sk','MarkerSize',8,'MarkerFaceColor','k')
+errorbar([pstart:pstop],candRate,eCandRate,'sk','MarkerSize',8,'MarkerFaceColor','k')
 xlabel('Period ID', labelOpts{:})
 ylabel('Candidate rate [day^{-1}]', labelOpts{:})
 hold on

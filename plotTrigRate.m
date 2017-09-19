@@ -2,7 +2,7 @@ function plotTrigRate(runid)
 % Simply loads & plot TrigRate info from dsts
 % OMH 15/07/2017
 
-dsip 'in process...'
+disp 'in process...'
 return
 
 SharedGlobals;
