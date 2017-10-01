@@ -96,7 +96,7 @@ end
 %hist(Detectors(sel))
 
 date_start = max(dst.Struct.Setup.RunTimeStart);
-[year, month, day, hour, minute, second]=unixsecs2date(date_start);
+[year, month, day, hour, minute, second]=UnixSecs2Date(date_start);
 disp(sprintf('*** Run %d - %02d/%02d/%d', nrun, day, month, year))
 disp(sprintf('%d antennas and %d scintillators',nAnts,nScints))
 disp(sprintf('%d coincs, %d valid (%3.1f pc). Mean multiplicity=%3.1f, Max mult=%d.',ncoincs,length(sel),length(sel)/ncoincs*100,mean(mult(sel)),max(mult(sel))))

@@ -130,27 +130,26 @@ for i = 1:ncand
     mnei = nei{i};
 %   if mnei(4,1)>0  % Hardest 
 %    if mnei(1,5)>0  %Softest
-%    if mnei(3,3)>1  %Best: 2mn+50% mnei(3,3)>0   ==> ab2.ttx
-    if mnei(1,4)>0  %Best: 30s+66% mnei(1,4)>0  ==> ab.txt 
+%    if mnei(4,2)>1   %test
+    if mnei(1,4)>0  %Best: 30s+66% mnei(1,4)>0  
         %disp 'Skip 5.'
         n5 = n5+1;
         continue
     end
     
-    if PeriodId>=9
+     if PeriodId>=1
         mants = ants{i};
-        badpat = sum(ismember(mants,[129 131 135 136 137 138]));
+         badpat = sum(ismember(mants,[135 136 137 138]));
         if badpat>=2
-            disp 'Skip 8.'
+            %disp 'Skip 8.'
             n8 = n8+1;
-            continue
+%             if sum(ismember(mants,127))>0
+%               disp '127 in'
+%               pause
+%             end
+%            continue
         end
-       ewpol = sum(ismember(mants,[148:153]));  % Antennas measuring EW polar
-        if ewpol>=1
-            disp 'Skip 9.'
-            continue
-        end
-    end    
+     end    
     
 %    disp 'Selected.'
 %     if length(ants{i}) > maxmult
@@ -162,7 +161,9 @@ for i = 1:ncand
 end
 sel = find(valid==1);
 val = [ncand n1 n2 n6 n7 n3 n4 n5 n8 length(sel)];
-nsurv2 = [ncand ncand-cumsum(val(2:8))];
+nsurv2 = [ncand ncand-cumsum(val(2:9))];
+size(nsurv)
+size(nsurv2)
 % Display
 cuts = {'L>4','Radius','Chi2','Theta<80','Barycenter','BadSignals','Pattern','Dir neighbours','Time neighbours'};
 display '*** Results of CandidatesAnalysis_v2 cuts ***'
@@ -170,7 +171,7 @@ for i =1:length(sumsurv)-1
     disp(sprintf('%s: %d coincs before --> %d after (%3.2f ratio)',cuts{i},sumsurv(i),sumsurv(i+1),sumsurv(i+1)./sumsurv(i)))  
 end
 display '*** Results of ScanCandidateDST cuts ***'
-cuts2 = {'BadPulses','Chi2','Radius','Amp','Theta','Dir neighbours','Time neighbours'};
+cuts2 = {'BadPulses','Chi2','Radius','Amp','Theta','Dir neighbours','Time neighbours','Flagged Antennas'};
 for i = 1:length(nsurv2)-1
   disp(sprintf('%s: %d coincs before --> %d after (%3.2f ratio)',cuts2{i},nsurv2(i),nsurv2(i+1),nsurv2(i+1)./nsurv2(i)))  
 end
@@ -256,25 +257,4 @@ for i=1:length(sel)
   end
   mult(i) = length(c.CandidateAntennas{1,sel(i)});
 end
-  % n115 = 0;
-% n137 = 0;
-% n128 = 0;
-% n112 = 0;
-%   antsin = c.CandidateAntennas{1,sel(i)};
-%   if size(find(antsin==137),2)==1
-%       disp 'Antenna 137 in!'
-%       n137 = n137+1;
-%   end
-%   if size(find(antsin==115),2)==1
-%       disp 'Antenna 115 in!'
-%       n115 = n115+1;
-%   end
-%   if size(find(antsin==128),2)==1
-%       disp 'Antenna 128 in!'
-%       n128 = n128+1;
-%   end
-%   if size(find(antsin==112),2)==1 
-%       disp 'Antenna 112 in!'
-%       n112 = n112+1;
-%   end  
-% end
+[run; coinc]'

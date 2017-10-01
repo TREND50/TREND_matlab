@@ -156,16 +156,16 @@ if CC==0  % Local PCS, no environment variables defined
         TEXT_PATH = './';
         CXX_PATH = '/home/martineau/TREND/cxx/';
         LOG_PATH = '../data/log/';
-        MONITOR_PATH = '../data/monitor/';
+        MONITOR_PATH = '../TREND/data/monitor/';
         if DC
             CAND_PATH = '../TREND/data/candidates/candidates_dc/'
         else
-            CAND_PATH = '../TREND/data/candidates_dst102014/'
+            CAND_PATH = '../TREND/data/candidates_dst102014/';
         end
         PSD_PATH = '../TREND/data/psd/';
-        STD_PATH = '../TREND/data/dst/dst_std/dst102014/';
-        HYB_PATH = '../TREND/data/dst/dst_hyb/';
-        SCI_PATH = '../TREND/data/dst/dst_scint/';
+        STD_PATH = '../TREND/data/dst102014/';
+        %HYB_PATH = '../TREND/data/dst/dst_hyb/';
+        %SCI_PATH = '../TREND/data/dst/dst_scint/';
         if DC 
             DST_PATH = '../data/dst/dst_dc/';
         else

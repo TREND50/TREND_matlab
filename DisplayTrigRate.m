@@ -31,7 +31,6 @@ ntf = [];
 detnball = zeros(1,length(ants));
 detnbt1all = zeros(1,length(ants));
 isin = zeros(1,length(ants));
-%detrateall = zeros(1,length(ants));
 for i =1:nruns
   if allruns{i}.id<runbeg
       continue
@@ -49,8 +48,9 @@ for i =1:nruns
   [c ia ib] = intersect(ants,thisDets);
   thisDetRate = det_coincrate(ib);
   thisDetRate(~isfinite(thisDetRate)) = 0;
-  detnball(end+1,ia) = round(thisDetRate*durh(end)*3600); %Nb events on each antenna for this run
-  detnbt1all(end+1,ia) = det_nbt1(ib); %Nb events on each antenna for this run
+  %
+  detnball(end+1,ia) = round(thisDetRate*durh(end)*3600); %Nb events on each antenna for this run (computed from T1 rate integration)
+  detnbt1all(end+1,ia) = det_nbt1(ib); %Nb events on each antenna for this run (true value)
   isin(end+1,ia) = thisDetRate>0;
 end    
 detnball(1,:) = [];
@@ -68,10 +68,11 @@ rate_west = sum(detnball(:,west).*isin(:,west),2)./sum((isin(:,west)>0),2)./durh
 cross = find(ants>=133);
 ratet1_cross = sum(detnbt1all(:,cross).*isin(:,cross),2)./sum((isin(:,cross)>0),2)./durh'/3600;
 rate_cross = sum(detnball(:,cross).*isin(:,cross),2)./sum((isin(:,cross)>0),2)./durh'/3600;
+detnbt1sum = sum(detnbt1all(runs>=runbeg & runs<=runend,:),1);
 
 %% Plots
 [unixs iasc] = sort(t.unixs);
-[yi, mi, di, hi, mni, si] = unixsecs2date(unixs);
+[yi, mi, di, hi, mni, si] = UnixSecs2Date(unixs);
 d = datenum(yi,mi,di,hi,mni,si);
 t0rate = t.t0rate(:,iasc);
 
@@ -101,6 +102,14 @@ coincrate = t.coincrate(iasc);
 smoothrate = smooth(coincrate,24*7);
 %     unixs = t.unixs;
 %     coincrate = t.coincrate;
+figure(27)
+in = find(detnbt1sum>0);
+plot(ants(in),detnbt1sum(in),'sk','MarkerFaceColor','k')
+grid on
+xlabel('Antenna ID')
+ylabel('Total T1s')
+pause
+
 figure(10)
 plot(d,coincrate,'k')
 hold on

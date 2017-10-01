@@ -118,6 +118,7 @@ else
         %% Now complete structure
         run.id = runid;
         run.dets = dets;
+        %run.nevts = nevts;
         run.dur = durh;
         run.nt1 = nt1;
         run.ntf = ntf;
