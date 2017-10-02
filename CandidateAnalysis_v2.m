@@ -2,6 +2,7 @@ function [] = CandidateAnalysis_v2(nrun,dstf)
 % Select candidates v2.
 % Writes it to dst.
 % OMH 18/06/2013
+% coco
 
 SharedGlobals;
 if nrun>= 3202  & nrun<= 3204
