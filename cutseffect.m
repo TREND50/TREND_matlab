@@ -4,24 +4,30 @@ function[]=cutseffect
 
 SharedGlobals;
 
-%1 mutiplicité>4
-%2 rayon>500
-%3 chi2<30
-%4 thetap<81
-%5 mean(barydist)>500
-%6 amplitude
-%7 status, bads<=1
-%8 ncomdir <=3
-%9 ncommon <=10
-
-%10 bads<=0
-%11 chi2 <=30
-%12 radius >=3000
-%13 ratio amplitude >=1
-%14 theta<=81 et theta>0
-%15 dirneib
-%16 neib
-%(17 if period>=9 ...)
+% Column: nb after following cuts:
+%1 nsimu
+%2 n4ants
+%3 n5ants (indicative)
+%4 ncoinc (reconstruction with L>=4)
+%5 nConsCoinc
+%6 nBadPulses
+%7 mutiplicité>4
+%8 rayon>500
+%9 chi2<30
+%10 thetap<81
+%11 mean(barydist)>500
+%12 amplitude or status, bads<=1
+%13 Pattern
+%14 ncomdir <=3
+%15 ncommon <=10
+%16 bads<=0
+%17 chi2 <=30
+%18 radius >=3000
+%19 ratio amplitude >=1
+%20 theta<=81 et theta>0
+%21 dirneib
+%22 neib
+%(23 if period>=9 ...)
 
 col = {'k','b','m','r','g','y','k--','b--','m--','r--','g--','y--','k.-','b.-','m.-','r.-','g.-','y.-',}
 En=[8e16 1e17 2e17 3e17 5e17 7e17 1e18 3e18];
@@ -35,7 +41,8 @@ a=[9973 35 18 31 27 27 12 12 12 12 12 12 12 12 12 12 12 10 10 10 9 9 9;
 1981 234 203 230 201 198 164 163 163 161 156 156 143 141 140 135 135 132 132 132 114 105 105;
 3250 439 372 425 366 331 286 281 276 271 255 255 232 232 232 228 228 222 222 221 184 169 169;
 2899 544 473 536 461 425 363 361 339 329 302 282 263 263 262 213 213 203 203 203 176 166 166]
-
+sum(a,1)'
+pause
 ref=a(:,2);  
 for i=1:length(En)
   r(i,:)=a(i,:)/ref(i);

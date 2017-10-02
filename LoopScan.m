@@ -60,13 +60,13 @@ for i=1:9
     tht(i) = mean(thtot(sel));
     N(i) = length(sel);
 end
-errorbar(tht,N/max(N),sqrt(N)/max(N), 'sb-','MarkerFaceColor','b' );
+errorbar(tht,N,sqrt(N), 'sk-','MarkerFaceColor','k','LineWidth',2 );
 %errorbar(tht,N/N(7)*0.3425,sqrt(N)/max(N), 'sb-','MarkerFaceColor','b','LineWidth',2 );
 grid on
 xlim([0 90])
 %ylim([0 1.9])
 xlabel('Zenith angle [deg]', labelOpts{:})
-ylabel('Fraction of showers detected', labelOpts{:})
+ylabel('dN/d\theta [10deg^{-1}]', labelOpts{:})
 disp ' '
 
 figure(13)
@@ -79,9 +79,12 @@ for i=1:36
     pht(i) = mean(phtot(sel));
     N(i) = length(sel);
 end    
-errorbar(pht,N/max(N),sqrt(N)/max(N), 'sr-','MarkerFaceColor','r' );
+errorbar(pht,N,sqrt(N), 'sk-','MarkerFaceColor','k','LineWidth',2 );
+xlabel('Azimuth angle [deg]', labelOpts{:})
+ylabel('dN/d\phi [40deg^{-1}]', labelOpts{:})
 grid on
-xlim([0 361])
+xlim([0 360])
+
 
 figure(8)
 hist(multot(multot>=5))
@@ -106,7 +109,7 @@ ylabel('log10(Radius) [m]', labelOpts{:})
 
 %pause
 figure(4)
-PrepareSkyPlot(4);
+prepareSkyplot(4);
 h = polar( phtot*DEG2RAD(1), thtot, 'k*');
 set(h, 'MarkerFaceColor', 'g' );  
 SmoothSkyplot(thtot,phtot);

@@ -30,7 +30,7 @@ end
 
 L = CoincStruct.Mult;
 Lant = CoincStruct.MultAnt;
-Lsci = CoincStruct.MultSci;
+%Lsci = CoincStruct.MultSci;
 thetap = CoincStruct.PlanRecons.Radio.Theta;
 phip = CoincStruct.PlanRecons.Radio.Phi;
 dthetap = CoincStruct.PlanRecons.Radio.dTheta;
@@ -62,9 +62,11 @@ for i=1:length(cid)  % Scan all coincs in the list
   expdelays = CoincStruct.Det.TrigTime(ind,in)'/FSAMPLING*1e9;  % Measured delays (samples->ns)
   
   %% Compute expected delays
-  detId = CoincStruct.Det.Id(ind,in)';
+  %detId = CoincStruct.Det.Id(ind,in)';
+  %[a ind_det]=intersect(Detectors,detId);
+  ind_det = in
+  detId = Detectors(in)'
   
-  [a ind_det]=intersect(Detectors,detId);
   %if sum(DetectorType(ind_det))>0  % Skip scintillators
   %    continue
   %end

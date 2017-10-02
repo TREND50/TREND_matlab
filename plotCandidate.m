@@ -33,7 +33,7 @@ if size(ind,1)==0
     return; 
 elseif IsShower(ind)==0
     disp(sprintf('Coinc %d is not a shower candidate. Aborting.',id))
-    return;
+    %return;
 end
 indant = find(tag(ind,:)==1);
 
