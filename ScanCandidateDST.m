@@ -81,8 +81,7 @@ for i = 1:ncand
 %     if sum(ismember(badruns,run(i)))>0
 %         continue
 %     end
-    %disp(sprintf('R%dC%d',run(i),coinc(i)))
-    
+%    disp(sprintf('R%dC%d',run(i),coinc(i)))
     mult = length(c.CandidateAntennas{i});
     if mult<minmult
         continue
@@ -111,7 +110,7 @@ for i = 1:ncand
         continue
     end
     
-    if thetap(i)>80 | thetap(i)<0
+    if thetas(i)>80 | thetas(i)<0
         %| abs(thetas(i)-thetap(i))>10 | abs(phis(i)-phip(i))>3 
         %disp 'Skip 3'
         n3 = n3+1;
@@ -122,6 +121,7 @@ for i = 1:ncand
 %    if mdirnei(4,1)>0  % Hardest
 %    if mdirnei(1,5)>0  % Softest
     if mdirnei(3,2)>0  %Best 20mn + 33% mdirnei(3,2)>0
+%    if mdirnei(4,1)>1  %Test
        %disp 'Skip 4.'
         n4 = n4+1;
         continue
@@ -137,7 +137,7 @@ for i = 1:ncand
         continue
     end
     
-     if PeriodId>=1
+     if PeriodId>=9
         mants = ants{i};
          badpat = sum(ismember(mants,[135 136 137 138]));
         if badpat>=2
@@ -257,4 +257,4 @@ for i=1:length(sel)
   end
   mult(i) = length(c.CandidateAntennas{1,sel(i)});
 end
-[run; coinc]'
+[run; coinc; thpel; phpel]'

@@ -76,7 +76,7 @@ slope = SphStruct.SlopeDelay;
 
 if exist('reft') & reft>0
     disp 'Selecting events in time window.'
-    sel = find(mult>0 & time>reft-2 & time<reft+2 );
+    sel = find(mult>0 & time>reft-5 & time<reft+5 );
 else
     sel = find(mult>=4);
     %sel = find(mult>=6 & time<18 & time>14 & thetas'<85 & thetap'<85); %Plane track R3005
@@ -104,9 +104,10 @@ if length(sel)==0
     return
 end
 mult = mult(sel);
+timetot = time;
 time = time(sel);
-tmin = min(time);
-tmax = max(time);
+tmin = min(min(time));  % Max 
+tmax = max(max(time));
 thetap = thetap(sel);
 phip = phip(sel);
 thetas = thetas(sel);
@@ -154,8 +155,8 @@ subplot(2,1,2)
 plot(chi2,slope,'+k')
 xlabel('Chi2', labelOpts{:})
 ylabel('Slope', labelOpts{:})
-statsChi2 = datastats(chi2)
-statsSlope = datastats(slope)
+statsChi2 = datastats(chi2);
+statsSlope = datastats(slope);
 % Chi2 as a function of antennas in event
 for i = 1:length(Detectors)
    indant = find(Detectors==Detectors(i));
@@ -178,8 +179,23 @@ ylabel('Mean Chi2')
 %% Azimuth vs time
 figure(222)
 set(222,'Name',sprintf('R%d - Azimuth vs Time',nrun),'NumberTitle', 'off','Position',[1 scrsz(2) scrsz(3)*0.95 scrsz(4)/1.2]);
-subplot(2,1,1)
+subplot(3,1,1)
 % Event rate
+for i = 0:floor(max(timetot))
+    eventrate(i+1) = length(find(timetot>i & timetot<i+1));
+end
+eventrate = eventrate/60;
+plot(0:max(timetot),eventrate,'k','LineWidth',2)
+xlabel('Time [mn]', labelOpts{:})
+ylabel('Coinc rate [Hz]', labelOpts{:})
+grid on
+if exist('reft')
+    line([reft reft],[0 max(eventrate)])
+end
+
+subplot(3,1,2)
+% Event rate
+eventrate = [];
 for i = 0:floor(tmax)
     eventrate(i+1) = length(find(time>i & time<i+1));
 end
@@ -189,9 +205,9 @@ xlabel('Time [mn]', labelOpts{:})
 ylabel('Coinc rate [Hz]', labelOpts{:})
 xlim([tmin tmax])
 grid on
-subplot(2,1,2)
+subplot(3,1,3)
 ic = 1;
-plot(time(sky),phis(sky),'sm','MarkerSize',6);
+plot(time,phis,'sm','MarkerSize',6);
 hold on
 for lcut=linf:step:lsup
     selmult = find( mult >= lcut & mult<lcut+step);
@@ -304,7 +320,7 @@ figure(7)
 set(7,'Name',sprintf('R%d - Reconstructed source position histos',nrun),'NumberTitle', 'off');
 subplot(2,1,1)
 hist(xs,100)
-datastats(xs)
+datastats(xs);
 subplot(2,1,2)
 hist(ys,100)
-datastats(ys)
+datastats(ys);

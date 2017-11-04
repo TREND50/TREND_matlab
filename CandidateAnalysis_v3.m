@@ -20,7 +20,7 @@ cutsettings.AmpRatioCut = 1.0; %ORIGINAL = 1.5
 cutsettings.TimeCut = 30; % Time window [seconds]
 cutsettings.DirTimeCut = 3; % Time window for same direction [minutes]
 cutsettings.MaxAnt = 10;
-cutsettings.PhiCut = 10;  % Same direction [deg]
+cutsettings.PhiCut = 5;  % Same direction [deg]
 cutsettings.DirMaxAnt = 3;
 cutsettings.AntRatioCut = 0.66; % Max ratio of antennas in common with neighbouring events 
 cutsettings.TimeVector = [30 60 120 150];  %seconds
@@ -58,7 +58,7 @@ end
 
 %candname = [CAND_PATH sprintf('Candidates_Period%d_L4.mat',periodID)];
 %CAND_PATH = './'
-candname = [CAND_PATH sprintf('Candidates_Period%d_test.mat',periodID)];
+candname = [CAND_PATH sprintf('Candidates_Period%d_v3.mat',periodID)];
 disp(sprintf('Now loading DST %s...',candname))
 
 if fopen(candname)>0
@@ -135,7 +135,7 @@ end;
 
 %% Loop on sub dsts
 meta = 1;
-filename = [CAND_PATH sprintf('selection_Period%d.txt',periodID)];
+filename = [CAND_PATH sprintf('selection_Period%d_v3.txt',periodID)];
 
 while meta<=nbiter
 
@@ -162,6 +162,12 @@ while meta<=nbiter
     tag = CoincStruct.Det.Tag;
     amp = CoincStruct.Det.AmpMax;
     sig = CoincStruct.Det.Sigma;
+    nliv = length(sum(tag,1)>100);
+    if nliv<20
+        disp(sprintf('Only %d antennas with 100+ events in this dst. Skip.',nliv))
+        meta = meta +1;
+        continue
+    end
     if isSimu
         stat = ones(ncoincs,length(Detectors));
     else
@@ -283,11 +289,19 @@ while meta<=nbiter
             disp(sprintf('%d/%d',i,length(sel)))
         end
         ind = sel(i);
+        nafter = length(find(times-times(ind)<60 & times>times(ind))); % At least one coinc in last 1 minutes
+        nbefore = length(find(times(ind)-times<60 & times<times(ind))); % At least one coinc in next 1 minutes
+        if nafter==0 | nbefore==0
+            %disp("No event before/after candidate. Skip.")
+            continue
+        end
+        
         in = find(tag(ind,:)>0);
         out = find(tag(ind,:)==0);
 %         if CoincStruct.IdCoinc(ind)<1322141
 %           continue
 %         end
+%         CoincStruct.IdCoinc(ind)
         
         %% Barycenter
         bary_cand=[mean(X(in)) mean(Y(in)) mean(Z(in))];
@@ -432,8 +446,7 @@ while meta<=nbiter
         end
         %azsel = find(chi2p<cutsettings.Chi2pCut & abs(slopep-1)<0.1 & chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phip-phip(ind))<cutsettings.PhiCut);
         azsel = find(chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phis-phis(ind))<cutsettings.PhiCut);
-        %azsel = find(abs(phis-phis(ind))<cutsettings.PhiCut);
-        
+   
         comdir = zeros(3,5);
         DirTimeCut = cutsettings.DirTimeVector;
         for t = 1:length(DirTimeCut)
@@ -441,6 +454,9 @@ while meta<=nbiter
             neighbourgs = intersect(timesel2,azsel);
             common = zeros(1,length(neighbourgs));
             for j = 1:length(neighbourgs)
+                %CoincStruct.IdCoinc(neighbourgs(j))
+                %Detectors(tag(neighbourgs(j),:)==1)
+                %Detectors(tag(ind,:)==1)
                 toto=tag(neighbourgs(j),:)+tag(ind,:);
                 common(j) = length(find(toto==2))./mult(ind);
             end

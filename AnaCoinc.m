@@ -131,6 +131,11 @@ for i=1:length(cid)  % Scan all coincs in the list
     
     %% Envir
     AnaRecons(nrun,coinc_min,dst);   % Skip this when using hybrid dst...
+    close(1)
+    close(8)
+    close(30)
+    close(31)
+    close(7)
     
     %% Ground plot
     ifig = Layout(nrun,dst);
