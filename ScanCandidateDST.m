@@ -118,8 +118,8 @@ for i = 1:ncand
     mdirnei = dirnei{i};
 %    if mdirnei(4,1)>0  % Hardest
 %    if mdirnei(1,5)>0  % Softest
-    if mdirnei(3,2)>0  %Best 20mn + 33% mdirnei(3,2)>0
-%    if mdirnei(2,1)>1  %Test
+%    if mdirnei(3,2)>0  %Best 20mn + 33% mdirnei(3,2)>0
+    if mdirnei(4,3)>1  %Test
        %disp 'Skip 4.'
         n4 = n4+1;
         continue

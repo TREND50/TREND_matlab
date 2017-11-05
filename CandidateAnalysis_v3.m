@@ -20,7 +20,7 @@ cutsettings.AmpRatioCut = 1.0; %ORIGINAL = 1.5
 cutsettings.TimeCut = 30; % Time window [seconds]
 cutsettings.DirTimeCut = 3; % Time window for same direction [minutes]
 cutsettings.MaxAnt = 10;
-cutsettings.PhiCut = 5;  % Same direction [deg]
+cutsettings.PhiCut = 10;  % Same direction [deg]
 cutsettings.DirMaxAnt = 3;
 cutsettings.AntRatioCut = 0.66; % Max ratio of antennas in common with neighbouring events 
 cutsettings.TimeVector = [30 60 120 150];  %seconds
@@ -298,14 +298,14 @@ while meta<=nbiter
 %         end
         %thisMin = floor(time(ind));
         %detCoincRate(max(1,thisMin-20):min(thisMin+20,size(detCoincRate,1)),in)  % Does not seem to work!
-        tsel = find(times>times(ind)-600 & times<=times(ind));
-        nbefore = length(find(sum(tag(tsel,in),1)>1)); % Nb of antennas with at least one event in coinc in the previous 10 minutes
-        tsel = find(times>=times(ind) & times<times(ind)+600);
-        nafter = length(find(sum(tag(tsel,in),1)>1)); % Nb of antennas with at least one event in coinc in the previous 10 minutes
-        if nafter<2 | nbefore<2
+        tsel = find(times>times(ind)-1200 & times<=times(ind));
+        nbefore = length(find(sum(tag(tsel,in),1)>1)); % Nb of antennas involved in another coinc at least in previous 10 minutes
+        tsel = find(times>=times(ind) & times<times(ind)+1200);
+        nafter = length(find(sum(tag(tsel,in),1)>1)); % Nb of antennas involved in another coinc at least in following 10 minutes
+        if nafter<2 | nbefore<2 % Request at least 2 antennas before & after
             disp('Not enough events before/after candidate. Skip.')
             n0 = n0+1
-            continue
+            %continue
         end
 
         
