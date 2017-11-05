@@ -514,7 +514,6 @@ while meta<=nbiter
     fprintf( fid, '%6d ', res(12)); % n4
     fprintf( fid, '%6d ', res(13));   % n5
     fprintf( fid, '%6d ', res(14));   % nCands
-    fprintf( fid, '%6d ', res(15));   % nCands
     fprintf( fid, '\n' );
     fclose(fid);
     meta = meta+1;
