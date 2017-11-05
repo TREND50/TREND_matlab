@@ -251,8 +251,8 @@ while meta<=nbiter
         nthetagood = length(find(thetar<cutsettings.ThetaCut));
         disp(sprintf('With theta*<%d deg:%d ',cutsettings.ThetaCut,nthetagood))
     end
-    sel = find(mult>3);
-    disp(sprintf('With L>3: %d',length(sel)))
+    sel = find(mult>4);
+    disp(sprintf('With L>4: %d',length(sel)))
     res = [ncoincs length(sel)];
     %sel = intersect(sel,find(chi2s<cutsettings.Chi2sCut & abs(slopes-1)<1.1));
     %disp(sprintf('With valid spherical recons: %d',length(sel)))
@@ -303,7 +303,7 @@ while meta<=nbiter
         tsel = find(times>=times(ind) & times<times(ind)+600);
         nafter = length(find(sum(tag(tsel,in),1)>1)); % Nb of antennas with at least one event in coinc in the previous 10 minutes
         if nafter<2 | nbefore<2
-            disp("Not enough events before/after candidate. Skip.")
+            disp('Not enough events before/after candidate. Skip.')
             n0 = n0+1
             continue
         end

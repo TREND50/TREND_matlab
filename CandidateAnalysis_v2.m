@@ -58,7 +58,7 @@ end
 
 %candname = [CAND_PATH sprintf('Candidates_Period%d_L4.mat',periodID)];
 %CAND_PATH = './'
-candname = [CAND_PATH sprintf('Candidates_Period%d_test.mat',periodID)];
+candname = [CAND_PATH sprintf('Candidates_Period%d.mat',periodID)];
 disp(sprintf('Now loading DST %s...',candname))
 
 if fopen(candname)>0
@@ -244,8 +244,8 @@ while meta<=nbiter
         nthetagood = length(find(thetar<cutsettings.ThetaCut));
         disp(sprintf('With theta*<%d deg:%d ',cutsettings.ThetaCut,nthetagood))
     end
-    sel = find(mult>3);
-    disp(sprintf('With L>3: %d',length(sel)))
+    sel = find(mult>4);
+    disp(sprintf('With L>4: %d',length(sel)))
     res = [ncoincs length(sel)];
     %sel = intersect(sel,find(chi2s<cutsettings.Chi2sCut & abs(slopes-1)<1.1));
     %disp(sprintf('With valid spherical recons: %d',length(sel)))
