@@ -12,7 +12,6 @@ if ~exist('down')
 end
 
 %% Reads CandidateAnalysis selection results
-%selectionfile = sprintf('selection_Period%d_L4.txt',PeriodId);
 selectionfile = sprintf('selection_Period%d.txt',PeriodId);
 selectionfile = [CAND_PATH selectionfile];
 a = load(selectionfile);
@@ -36,7 +35,6 @@ sumsurv = sum(nsurv,1);
 badruns=[];
 
 %% Load results DST
-%dstname = sprintf('Candidates_Period%d_L4.mat',PeriodId);
 dstname = sprintf('Candidates_Period%d.mat',PeriodId);
 dstname = [CAND_PATH dstname]; 
 if fopen(dstname)<0

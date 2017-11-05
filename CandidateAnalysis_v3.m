@@ -157,6 +157,7 @@ while meta<=nbiter
     ncoincs = dst.Struct.Setup.TotalCoinc;
     DetStruct = dst.Struct.Setup.Det;
     Detectors = [DetStruct.Name];
+    detCoincRate = dst.Struct.Setup.InfosRun.DetCoincRateRaw;
     evt = [DetStruct.Evt];
     CoincStruct = dst.Struct.Coinc;
     tag = CoincStruct.Det.Tag;
@@ -164,7 +165,7 @@ while meta<=nbiter
     sig = CoincStruct.Det.Sigma;
     nliv = length(sum(tag,1)>100);
     if nliv<20
-        disp(sprintf('Only %d antennas with 100+ events in this dst. Skip.',nliv))
+        disp(sprintf('Only %d antennas with 100+ coinc events in this dst. Skip.',nliv))
         meta = meta +1;
         continue
     end
@@ -278,6 +279,7 @@ while meta<=nbiter
     %% Loop on candidates
     disp(sprintf('%d possible candidates to be checked.',length(sel)))
     %pause
+    n0 = 0;
     n1 = 0;
     n2 = 0;
     n3 = 0;
@@ -289,19 +291,23 @@ while meta<=nbiter
             disp(sprintf('%d/%d',i,length(sel)))
         end
         ind = sel(i);
-        nafter = length(find(times-times(ind)<60 & times>times(ind))); % At least one coinc in last 1 minutes
-        nbefore = length(find(times(ind)-times<60 & times<times(ind))); % At least one coinc in next 1 minutes
-        if nafter==0 | nbefore==0
-            %disp("No event before/after candidate. Skip.")
-            continue
-        end
-        
         in = find(tag(ind,:)>0);
         out = find(tag(ind,:)==0);
-%         if CoincStruct.IdCoinc(ind)<1322141
+%         if CoincStruct.IdCoinc(ind)<3462355
 %           continue
 %         end
-%         CoincStruct.IdCoinc(ind)
+        %thisMin = floor(time(ind));
+        %detCoincRate(max(1,thisMin-20):min(thisMin+20,size(detCoincRate,1)),in)  % Does not seem to work!
+        tsel = find(times>times(ind)-600 & times<=times(ind));
+        nbefore = length(find(sum(tag(tsel,in),1)>1)); % Nb of antennas with at least one event in coinc in the previous 10 minutes
+        tsel = find(times>=times(ind) & times<times(ind)+600);
+        nafter = length(find(sum(tag(tsel,in),1)>1)); % Nb of antennas with at least one event in coinc in the previous 10 minutes
+        if nafter<2 | nbefore<2
+            disp("Not enough events before/after candidate. Skip.")
+            n0 = n0+1
+            continue
+        end
+
         
         %% Barycenter
         bary_cand=[mean(X(in)) mean(Y(in)) mean(Z(in))];
@@ -491,7 +497,7 @@ while meta<=nbiter
              n5 = n5+1;
         end
     end
-    res = [nrun meta res n1 n2 n3 n4 n5 length(find(CandidateRun==nrun))]
+    res = [nrun meta res n0 n1 n2 n3 n4 n5 length(find(CandidateRun==nrun))]
     filename
     fid = fopen(filename, 'a+' )
     fprintf( fid, '%6d ', res(1));   % Run
@@ -501,12 +507,14 @@ while meta<=nbiter
     fprintf( fid, '%6d ', res(5));   % Radius
     fprintf( fid, '%6d ', res(6));   % ValidPlan
     fprintf( fid, '%6d ', res(7));   % Theta
-    fprintf( fid, '%6d ', res(8));   % n1
-    fprintf( fid, '%6d ', res(9));   % n2
-    fprintf( fid, '%6d ', res(10)); % n3
-    fprintf( fid, '%6d ', res(11)); % n4
-    fprintf( fid, '%6d ', res(12));   % n5
-    fprintf( fid, '%6d ', res(13));   % nCands
+    fprintf( fid, '%6d ', res(8));   % n0
+    fprintf( fid, '%6d ', res(9));   % n1
+    fprintf( fid, '%6d ', res(10));   % n2
+    fprintf( fid, '%6d ', res(11)); % n3
+    fprintf( fid, '%6d ', res(12)); % n4
+    fprintf( fid, '%6d ', res(13));   % n5
+    fprintf( fid, '%6d ', res(14));   % nCands
+    fprintf( fid, '%6d ', res(15));   % nCands
     fprintf( fid, '\n' );
     fclose(fid);
     meta = meta+1;
