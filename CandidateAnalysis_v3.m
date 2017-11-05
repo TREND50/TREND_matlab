@@ -164,11 +164,11 @@ while meta<=nbiter
     amp = CoincStruct.Det.AmpMax;
     sig = CoincStruct.Det.Sigma;
     nliv = length(sum(tag,1)>100);
-    if nliv<20
-        disp(sprintf('Only %d antennas with 100+ coinc events in this dst. Skip.',nliv))
-        meta = meta +1;
-        continue
-    end
+%     if nliv<20
+%         disp(sprintf('Only %d antennas with 100+ coinc events in this dst. Skip.',nliv))
+%         meta = meta +1;
+%         continue
+%     end
     if isSimu
         stat = ones(ncoincs,length(Detectors));
     else
@@ -450,8 +450,8 @@ while meta<=nbiter
         if size(r,1)>1  % Radius defined as a  line vector instead of column for some runs
             r = r';
         end
-        azsel = find(chi2p<cutsettings.Chi2pCut & abs(slopep-1)<0.1 & chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phip-phip(ind))<cutsettings.PhiCut);
-        %azsel = find(chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phis-phis(ind))<cutsettings.PhiCut);
+        %azsel = find(chi2p<cutsettings.Chi2pCut & abs(slopep-1)<0.1 & chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phip-phip(ind))<cutsettings.PhiCut);  %original
+        azsel = find(chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phis-phis(ind))<cutsettings.PhiCut);  %Compare spherical rather than plane
    
         comdir = zeros(3,5);
         DirTimeCut = cutsettings.DirTimeVector;
