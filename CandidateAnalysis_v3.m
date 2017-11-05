@@ -450,8 +450,8 @@ while meta<=nbiter
         if size(r,1)>1  % Radius defined as a  line vector instead of column for some runs
             r = r';
         end
-        %azsel = find(chi2p<cutsettings.Chi2pCut & abs(slopep-1)<0.1 & chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phip-phip(ind))<cutsettings.PhiCut);
-        azsel = find(chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phis-phis(ind))<cutsettings.PhiCut);
+        azsel = find(chi2p<cutsettings.Chi2pCut & abs(slopep-1)<0.1 & chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phip-phip(ind))<cutsettings.PhiCut);
+        %azsel = find(chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phis-phis(ind))<cutsettings.PhiCut);
    
         comdir = zeros(3,5);
         DirTimeCut = cutsettings.DirTimeVector;

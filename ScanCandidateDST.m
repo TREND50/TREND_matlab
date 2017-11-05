@@ -35,7 +35,7 @@ sumsurv = sum(nsurv,1);
 badruns=[];
 
 %% Load results DST
-dstname = sprintf('Candidates_Period%d.mat',PeriodId);
+dstname = sprintf('Candidates_Period%d_v3.mat',PeriodId);
 dstname = [CAND_PATH dstname]; 
 if fopen(dstname)<0
     disp(sprintf('File %s not found. Abort.',dstname))
@@ -119,7 +119,7 @@ for i = 1:ncand
 %    if mdirnei(4,1)>0  % Hardest
 %    if mdirnei(1,5)>0  % Softest
     if mdirnei(3,2)>0  %Best 20mn + 33% mdirnei(3,2)>0
-%    if mdirnei(4,1)>1  %Test
+%    if mdirnei(2,1)>1  %Test
        %disp 'Skip 4.'
         n4 = n4+1;
         continue
