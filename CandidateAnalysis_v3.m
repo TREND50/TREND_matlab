@@ -20,7 +20,7 @@ cutsettings.AmpRatioCut = 1.0; %ORIGINAL = 1.5
 cutsettings.TimeCut = 30; % Time window [seconds]
 cutsettings.DirTimeCut = 3; % Time window for same direction [minutes]
 cutsettings.MaxAnt = 10;
-cutsettings.PhiCut = 10;  % Same direction [deg]
+cutsettings.PhiCut = 5;  % Same direction [deg]
 cutsettings.DirMaxAnt = 3;
 cutsettings.AntRatioCut = 0.66; % Max ratio of antennas in common with neighbouring events 
 cutsettings.TimeVector = [30 60 120 150];  %seconds
@@ -293,7 +293,7 @@ while meta<=nbiter
         ind = sel(i);
         in = find(tag(ind,:)>0);
         out = find(tag(ind,:)==0);
-%         if CoincStruct.IdCoinc(ind)<3462355
+%         if CoincStruct.IdCoinc(ind)<108220
 %           continue
 %         end
         %thisMin = floor(time(ind));
@@ -305,7 +305,7 @@ while meta<=nbiter
         if nafter<2 | nbefore<2 % Request at least 2 antennas before & after
             disp('Not enough events before/after candidate. Skip.')
             n0 = n0+1
-            %continue
+            continue
         end
 
         
@@ -492,8 +492,10 @@ while meta<=nbiter
             CandidateDirNeighbourgs{end+1} = comdir;
             CandidateAntennas{end+1} = Detectors(in);
          elseif  ncomdir>cutsettings.DirMaxAnt   
+             %disp(sprintf('Coinc %d: too many candidates in same dir. Skip candidate.',idp(ind)))
              n4 = n4+1;
          elseif ncommon>cutsettings.MaxAnt   
+             %disp(sprintf('Coinc %d: too many candidates in same time frame. Skip candidate.',idp(ind)))
              n5 = n5+1;
         end
     end

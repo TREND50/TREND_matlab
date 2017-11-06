@@ -285,9 +285,10 @@ while meta<=nbiter
         ind = sel(i);
         in = find(tag(ind,:)>0);
         out = find(tag(ind,:)==0);
-%         if CoincStruct.IdCoinc(ind)<1322141
+%         if CoincStruct.IdCoinc(ind)<175482
 %           continue
 %         end
+%        CoincStruct.IdCoinc(ind)
         
         %% Barycenter
         bary_cand=[mean(X(in)) mean(Y(in)) mean(Z(in))];
@@ -430,10 +431,7 @@ while meta<=nbiter
         if size(r,1)>1  % Radius defined as a  line vector instead of column for some runs
             r = r';
         end
-        %azsel = find(chi2p<cutsettings.Chi2pCut & abs(slopep-1)<0.1 & chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phip-phip(ind))<cutsettings.PhiCut);
-        azsel = find(chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phis-phis(ind))<cutsettings.PhiCut);
-        %azsel = find(abs(phis-phis(ind))<cutsettings.PhiCut);
-        
+        azsel = find(chi2p<cutsettings.Chi2pCut & abs(slopep-1)<0.1 & chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phip-phip(ind))<cutsettings.PhiCut);        
         comdir = zeros(3,5);
         DirTimeCut = cutsettings.DirTimeVector;
         for t = 1:length(DirTimeCut)
