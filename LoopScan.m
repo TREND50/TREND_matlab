@@ -14,8 +14,8 @@ radtot = [];
 ramptot = [];
 
 if EW==1
-    pstart = 1;
-    pstop = 8;
+    pstart = 6;
+    pstop = 6;
 else
     pstart = 9;
     pstop = 10;

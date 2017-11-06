@@ -164,11 +164,11 @@ while meta<=nbiter
     amp = CoincStruct.Det.AmpMax;
     sig = CoincStruct.Det.Sigma;
     nliv = length(sum(tag,1)>100);
-%     if nliv<20
-%         disp(sprintf('Only %d antennas with 100+ coinc events in this dst. Skip.',nliv))
-%         meta = meta +1;
-%         continue
-%     end
+    if nliv<20
+        disp(sprintf('Only %d antennas with 100+ coinc events in this dst. Skip.',nliv))
+        meta = meta +1;
+        continue
+    end
     if isSimu
         stat = ones(ncoincs,length(Detectors));
     else

@@ -35,7 +35,7 @@ sumsurv = sum(nsurv,1);
 badruns=[];
 
 %% Load results DST
-dstname = sprintf('Candidates_Period%d_v3_v1.mat',PeriodId);
+dstname = sprintf('Candidates_Period%d_v3.mat',PeriodId);
 dstname = [CAND_PATH dstname]; 
 if fopen(dstname)<0
     disp(sprintf('File %s not found. Abort.',dstname))
@@ -76,6 +76,9 @@ n7 = 0;
 n8 = 0;
 
 for i = 1:ncand
+    if run(i)>4841
+        break
+    end
 %     if sum(ismember(badruns,run(i)))>0
 %         continue
 %     end
@@ -118,8 +121,8 @@ for i = 1:ncand
     mdirnei = dirnei{i};
 %    if mdirnei(4,1)>0  % Hardest
 %    if mdirnei(1,5)>0  % Softest
-    if mdirnei(3,2)>0  %Best 20mn + 33% mdirnei(3,2)>0
-%    if mdirnei(4,3)>1  %Test
+%    if mdirnei(3,2)>0  %Best 20mn + 33% mdirnei(3,2)>0
+    if mdirnei(4,3)>0  %New best v3?
        %disp 'Skip 4.'
         n4 = n4+1;
         continue
@@ -128,7 +131,7 @@ for i = 1:ncand
     mnei = nei{i};
 %   if mnei(4,1)>1  % Hardest 
 %    if mnei(1,5)>0  %Softest
-    if mnei(4,5)>1   %test
+    if mnei(1,3)>0   %New best v3?
 %    if mnei(1,4)>0  %Best: 30s+66% mnei(1,4)>0  
         %disp 'Skip 5.'
         n5 = n5+1;
@@ -145,7 +148,7 @@ for i = 1:ncand
 %               disp '127 in'
 %               pause
 %             end
-%            continue
+            continue
         end
      end    
     
@@ -255,5 +258,6 @@ for i=1:length(sel)
   end
   mult(i) = length(c.CandidateAntennas{1,sel(i)});
 end
-selse = find(thpel>60 & phpel>210 & phpel<250)
+% selse = find(thpel>60 & phpel>210 & phpel<250)
+selse = find(thpel>0)
 [run(selse); coinc(selse); thpel(selse); phpel(selse)]'
