@@ -70,8 +70,21 @@ nsigma=2;
 ind=find(TimeDiff<100e-3);
 
 Deltat=TimeDiff;
-%figure,hist(Deltat,0:0.5e-3:100e-3)
-%hold on
+
+sel = find(Deltat<0.2);
+figure(1);
+hist(Deltat(sel)*1e3,0:0.5:200);
+xlim([0 200])
+xlabel('Delay (ms)')
+grid on
+
+figure(2);
+[n,x] = hist(Deltat(sel)*1e3,0:2:200);
+semilogy(x,n,'+k','MarkerSize',4,'LineWidth',2)
+xlim([0 200])
+xlabel('Delay (ms)')
+grid on
+pause
 
 
 if ConsCoincCompleteRejection==0 

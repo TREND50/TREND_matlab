@@ -1,4 +1,4 @@
- function [] = CandidateAnalysis_v2(nrun,dstf)
+ function [] = CandidateAnalysis_v3(nrun,dstf)
 % Select candidates v2.
 % Writes it to dst.
 % OMH 18/06/2013
@@ -17,10 +17,10 @@ cutsettings.Chi2pCut = 30;
 %cutsettings.Chi2pCut = 50;
 cutsettings.BaryCut = 500; % Mean distance to coinc barycenter [m]
 cutsettings.AmpRatioCut = 1.0; %ORIGINAL = 1.5
-cutsettings.TimeCut = 30; % Time window [seconds]
-cutsettings.DirTimeCut = 3; % Time window for same direction [minutes]
+cutsettings.TimeCut = 30; % Loosest time window [seconds]
+cutsettings.DirTimeCut = 3; % Loosest time window for same direction [minutes]
 cutsettings.MaxAnt = 10;
-cutsettings.PhiCut = 5;  % Same direction [deg]
+cutsettings.PhiCut = 10;  % Same direction [deg]
 cutsettings.DirMaxAnt = 3;
 cutsettings.AntRatioCut = 0.66; % Max ratio of antennas in common with neighbouring events 
 cutsettings.TimeVector = [30 60 120 150];  %seconds
@@ -164,7 +164,7 @@ while meta<=nbiter
     amp = CoincStruct.Det.AmpMax;
     sig = CoincStruct.Det.Sigma;
     nliv = length(sum(tag,1)>100);
-    if nliv<20
+    if nliv<18
         disp(sprintf('Only %d antennas with 100+ coinc events in this dst. Skip.',nliv))
         meta = meta +1;
         continue
@@ -298,16 +298,15 @@ while meta<=nbiter
 %         end
         %thisMin = floor(time(ind));
         %detCoincRate(max(1,thisMin-20):min(thisMin+20,size(detCoincRate,1)),in)  % Does not seem to work!
-        tsel = find(times>times(ind)-1200 & times<=times(ind));
-        nbefore = length(find(sum(tag(tsel,in),1)>1)); % Nb of antennas involved in another coinc at least in previous 10 minutes
+        tsel = find(times>times(ind)-1200 & times<times(ind));
+        nbefore = length(find(sum(tag(tsel,:),1)>0)); % Nb of antennas involved in another coinc at least in previous 10 minutes
         tsel = find(times>=times(ind) & times<times(ind)+1200);
-        nafter = length(find(sum(tag(tsel,in),1)>1)); % Nb of antennas involved in another coinc at least in following 10 minutes
-        if nafter<2 | nbefore<2 % Request at least 2 antennas before & after
-            disp('Not enough events before/after candidate. Skip.')
-            n0 = n0+1
+        nafter = length(find(sum(tag(tsel,:),1)>0)); % Nb of antennas involved in another coinc at least in following 10 minutes
+        if nafter<18 | nbefore<18 % Request at least 2 antennas before & after
+            %disp('Not enough events before/after candidate. Skip.')
+            n0 = n0+1;
             continue
         end
-
         
         %% Barycenter
         bary_cand=[mean(X(in)) mean(Y(in)) mean(Z(in))];
@@ -367,7 +366,8 @@ while meta<=nbiter
         [a ineid] = intersect([neid{:,1}],aDetectors(icenout));
         skip = 0;
         j = 1;
-        while j<=length(icenout) & skip<2 % Loop on non-triggered inner antennas
+        while 1<0
+        %while j<=length(icenout) & skip<2 % Loop on non-triggered inner antennas
           if aevt(icenout(j))<alivecut % Dead antenna: skip it 
               j = j+1;
               disp 'problem! Should not be here'
@@ -398,7 +398,7 @@ while meta<=nbiter
           if (lin>0 & rin>0) & (uin>0 & din>0)          
               %disp 'Hole!'
               %disp(sprintf('Wrong ground pattern: antenna %d did not trigger. ',Detectors(icenout(j))))
-              skip = skip+1;
+              %skip = skip+1;
               %break
           end
           j = j+1;
@@ -429,7 +429,6 @@ while meta<=nbiter
              n3 = n3+1;
              continue
         end
-        
 
         %% Matrix of neighbourgh events
         % Same ants
@@ -450,9 +449,13 @@ while meta<=nbiter
         if size(r,1)>1  % Radius defined as a  line vector instead of column for some runs
             r = r';
         end
-        %azsel = find(chi2p<cutsettings.Chi2pCut & abs(slopep-1)<0.1 & chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phip-phip(ind))<cutsettings.PhiCut);  %original
-        azsel = find(chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phis-phis(ind))<cutsettings.PhiCut);  %Compare spherical rather than plane
-   
+        deltaphip = phip-phip(ind);
+        % Handle properly case around 0°
+        deltaphip(deltaphip>180) = deltaphip(deltaphip>180)-360;
+        deltaphip(deltaphip<-180) = deltaphip(deltaphip<-180)+360;
+        azsel = find(chi2p<cutsettings.Chi2pCut & abs(slopep-1)<0.1 & chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(deltaphip)<cutsettings.PhiCut);   % Original     
+        %azsel = find(chi2p<cutsettings.Chi2pCut & abs(slopep-1)<0.1 & abs(deltaphip)<cutsettings.PhiCut);  %original
+        %azsel = find(chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phis-phis(ind))<cutsettings.PhiCut);  %Compare spherical rather than plane   
         comdir = zeros(3,5);
         DirTimeCut = cutsettings.DirTimeVector;
         for t = 1:length(DirTimeCut)
@@ -472,9 +475,7 @@ while meta<=nbiter
         end
         ncommon = com(find(TimeCut==cutsettings.TimeCut),find(frac==cutsettings.AntRatioCut));
         ncomdir = comdir(find(DirTimeCut/60==cutsettings.DirTimeCut),find(frac==cutsettings.AntRatioCut));
-        %if 1
-        %[idp(ind) length(timesel) ncommon ncomdir]
-        if (ncommon<=cutsettings.MaxAnt & ncomdir<=cutsettings.DirMaxAnt) | isSimu == 1 
+        if (ncommon<=cutsettings.MaxAnt & ncomdir<=cutsettings.DirMaxAnt) | isSimu == 1
             disp(sprintf('Coinc %d: candidate selected!',idp(ind)))
             CandidateRun=[CandidateRun nrun];
             CandidateCoinc=[CandidateCoinc idp(ind)];
@@ -499,9 +500,8 @@ while meta<=nbiter
              n5 = n5+1;
         end
     end
-    res = [nrun meta res n0 n1 n2 n3 n4 n5 length(find(CandidateRun==nrun))]
-    filename
-    fid = fopen(filename, 'a+' )
+    res = [nrun meta res n0 n1 n2 n3 n4 n5 length(find(CandidateRun==nrun))];
+    fid = fopen(filename, 'a+' );
     fprintf( fid, '%6d ', res(1));   % Run
     fprintf( fid, '%6d ', res(2));   % MetaRun
     fprintf( fid, '%6d ', res(3));   % Nini

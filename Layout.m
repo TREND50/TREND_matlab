@@ -1,4 +1,4 @@
-function [plotid]=Layout(nrun,dst)
+function [plotid]=Layout()
 % Display TREND layout for triggered detectirs in this run
 % Adaptated from pods.m
 % OMH 03/06/11
@@ -10,27 +10,18 @@ SharedGlobals;
 labelOpts = { 'FontSize', 18 };
 scrsz = get( 0, 'ScreenSize' );
 
-%% Load dst
-if ~exist('dst')
-    dstname = [DST_PATH sprintf(dst_filename,nrun,1)];
-    dst = load(dstname);
-end
-DetStruct = dst.Struct.Setup.Det;
-Detectors = [DetStruct.Name];
-isScint = [DetStruct.isScint];
-xpos_ant = [DetStruct.X];
-ypos_ant = [DetStruct.Y];
-zpos_ant = [DetStruct.Z];
-PodNb = [DetStruct.PodNb];
-xpos_pod = [DetStruct.PodX];
-ypos_pod = [DetStruct.PodY];
-zpos_pod = [DetStruct.PodZ];
+ants = [101:138 140 148:158];
+pos = SetupCharacteristics(ants,3001);
+[pos,podN,pos_pod]=SetupCharacteristics(ants,3001);
+xpos_ant = pos(:,1);
+ypos_ant = pos(:,2);
+zpos_ant = pos(:,3);
+xpos_pod = pos_pod(:,1);
+ypos_pod = pos_pod(:,2);
+zpos_pod = pos_pod(:,3);
 
 if 0
 %% Closest neighbours
-ants = find(isScint==0);
-Antennas= Detectors(ants);
-pos = [xpos_ant(ants)' ypos_ant(ants)' zpos_ant(ants)'];
 dist=zeros(size(pos,1),size(pos,1));
 for i=1:length(Antennas)
     for j=1:length(Antennas)
@@ -69,7 +60,7 @@ disp(sprintf('Total cable length = %3.1f m ', sum(dist_pod) ))
 end
 
 %% Plot
-plotid = nrun;
+plotid = 1;
 figure(plotid)
 xmin = -100;
 %xmin = -4500;
@@ -79,10 +70,10 @@ ymin = -500;
 %ymin = -2000;
 ymax = 800;
 %ymax = 7000;
-set(plotid, 'Name', sprintf('TREND layout - Run %d', nrun),'NumberTitle','off','Position',[1 1 scrsz(3)/1.5 scrsz(4)/2]);
+set(plotid, 'Name','TREND layout','NumberTitle','off','Position',[1 1 scrsz(3)/1.5 scrsz(4)/2]);
 axis([xmin,xmax,ymin,ymax])
-xlabel( 'W-E [ m ]', labelOpts{:} );
-ylabel( 'S-N [ m ]', labelOpts{:} );
+xlabel( 'Easting (m)', labelOpts{:} );
+ylabel( 'Northing (m)', labelOpts{:} );
 hold on    
 grid on
 
@@ -98,7 +89,7 @@ px=3.031;
 py=2.57;
 xpod=[-3*px -3*px 0 3*px 3*px 0 -3*px];
 ypod=[3*py -3*py -6*py -3*py 3*py 6*py 3*py];
-for i=1:length(Detectors)
+for i=1:length(ants)
     %plot(xpos_pod(i),ypos_pod(i),'dw','MarkerSize',8);
     plot(xpod+xpos_pod(i),ypod+ypos_pod(i),'w');
     if 0
@@ -112,12 +103,10 @@ for i=1:length(Detectors)
 end
 
 %% Detectors
-for i = 1:length( Detectors )
-    if isScint(i)==1
-        %plot( xpos_ant(i), ypos_ant(i), 'sr', 'MarkerSize', 8, 'MarkerFaceColor','r' );  %Ground view
-        %text( xpos_ant(i)+20, ypos_ant(i), num2str( Detectors(i) ), 'FontSize', 12, 'FontWeight', 'bold','Color','r' );
-    else
+for i = 1:length( ants )
         plot( xpos_ant(i), ypos_ant(i), '^k', 'MarkerSize', 8, 'MarkerFaceColor','y' );  %Ground view
-        text( xpos_ant(i)+20, ypos_ant(i), num2str( Detectors(i) ), 'FontSize', 12, 'FontWeight', 'bold','Color','w' );
-    end
+        text( xpos_ant(i)+20, ypos_ant(i), num2str( ants(i) ), 'FontSize', 11, 'FontWeight', 'bold','Color','w' );
 end
+
+%% Residence
+plot(1490,-50,'sr','MarkerFace', 'r', 'MarkerSize', 10 );

@@ -15,22 +15,25 @@ if ~exist('dis')
     dis = 1;
 end
 SharedGlobals;
+j = 0;
 r = 0;
 f = 0;
 nT0 = 0;
 nT1 = 0;
 tlive = 0;
-filename = sprintf( 'R%06d_A%04d_log.txt', nrun, antenna ); 
+for i = 1:length(antenna)
+filename = sprintf( 'R%06d_A%04d_log.txt', nrun, antenna(i) ); 
 filename = [LOG_PATH, filename];
 if fopen(filename)<0
     disp(sprintf('Could not find file %s',filename))
-    return
+    continue
+    %return
 end
 logfile=load(filename);
 format long
 if size(logfile,1)==0
 	disp 'Empty log file! Abort.'	
-	return
+	continue
 end
 
 time_step = 2^28*5e-9; % time to write a buffer
@@ -71,23 +74,37 @@ if dis
     ylabel('Std dev [LSB]',labelOpts{:})
     xlim([0 max(tmn)])
     grid on
+    
     figure(2)
-    set(2,'NumberTitle','off','Name','Trigger rate evolution')
-    subplot(2,1,1)
-    plot(tmn,spikerate,'k','Linewidth',2)
-    xlabel('Time [mn]',labelOpts{:})
-    ylabel('T0 trig rate [Hz]',labelOpts{:})
+    set(2,'NumberTitle','off','Name','T0 rate')
+%    subplot(2,1,1)
+    plot(tmn,spikerate+j*200,'Linewidth',1)
+    xlabel('Time (mn)',labelOpts{:})
+    ylabel('T0 rate (Hz)',labelOpts{:})
     xlim([0 max(tmn)])
+    text(100,j*200+100,sprintf('A%d',antenna(i)))
     grid on
-    subplot(2,1,2)
-    plot(tmn,trigrate,'g','Linewidth',2)
-    xlabel('Time [mn]',labelOpts{:})
-    ylabel('T1 trig rate [Hz]',labelOpts{:})
-    grid on
-    xlim([0 max(tmn)])
-
+    hold on
+%     subplot(2,1,2)
     figure(3)
-    set(3,'NumberTitle','off','Name','Event number')
+    set(3,'NumberTitle','off','Name','T1 rate')
+%    subplot(2,1,1)
+    plot(tmn,trigrate+j*200,'Linewidth',1)
+    xlabel('Time (mn)',labelOpts{:})
+    ylabel('T1 rate (Hz)',labelOpts{:})
+    xlim([0 max(tmn)])
+    text(100,j*200+100,sprintf('A%d',antenna(i)))
+    grid on
+    hold on
+
+    %     plot(tmn,trigrate,'g','Linewidth',2)
+%     xlabel('Time [mn]',labelOpts{:})
+%     ylabel('T1 trig rate [Hz]',labelOpts{:})
+%     grid on
+%     xlim([0 max(tmn)])
+
+    figure(30)
+    set(30,'NumberTitle','off','Name','Event number')
     %subplot(2,1,1)
     plot(tmn,nspiket,'k','Linewidth',2)
     hold on
@@ -150,6 +167,7 @@ if dis
     subplot(2,1,2)
     hist(check,100)  
     end
+    j = j+1
 end
 
 nT0 = nspiket(end);
@@ -157,9 +175,9 @@ nT1 = ntrigt(end);
 r = nT1/tmn(end)/60;
 f = nT1/nT0*100;
 tlive = tmn(end)-durlate;
-disp(sprintf('Run %d Antenna %d - %3.1f mins', nrun, antenna, tmn(end)))
+disp(sprintf('Run %d Antenna %d - %3.1f mins', nrun, antenna(i), tmn(end)))
 disp(sprintf('%d spikes (av rate = %3.1f Hz) & %d events recorded (av rate = %3.1f Hz). Ratio = %3.2f pc.',nT0,mean(spikerate),nT1,mean(trigrate),f))
-disp(sprintf('Out of scync for %d buf(s) ( = %3.2f mn, %3.2f pc of acq time)',nlate,  durlate, durlate/tmn(end)*100))
+disp(sprintf('Out of sync for %d buf(s) ( = %3.2f mn, %3.2f pc of acq time)',nlate,  durlate, durlate/tmn(end)*100))
 fclose all;
 
 end

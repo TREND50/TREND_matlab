@@ -1,6 +1,6 @@
 function [] = DisplayTrigRate(runbeg,runend)
 % Displays results from trigrate.mat
-% Scipt used for presentation at 2015 GRAND workshop
+% Script used for presentation at 2015 GRAND workshop
 
 SharedGlobals;
 DISPLAY = 1;
@@ -76,8 +76,13 @@ detnbt1sum = sum(detnbt1all(runs>=runbeg & runs<=runend,:),1);
 d = datenum(yi,mi,di,hi,mni,si);
 t0rate = t.t0rate(:,iasc);
 
+%cutdate = 1347753600;  %Quiet/Noisy
+cutdate = 1355184000;  %EW/NS
+quietperiod = find(unixs<cutdate);
+noisyperiod = find(unixs>cutdate);
+
 ind = 0;
-for i=1:length(ALLDETS)
+for i=1:length(ants)
     poss = floor(i/20.1);
     if poss~=floor((i-1)/20.1)
         ind = 0;
@@ -95,9 +100,42 @@ for i=1:length(ALLDETS)
     trun = t0rate(i,sel);
     nh = length(sel);
     disp(sprintf('Antenna %d: Fraction of time <10Hz: %3.2f pc, above 100Hz: %3.2f pc, above 500Hz: %3.2f pc', ALLDETS(i),length(find(trun<10))/nh*100,length(find(trun>100))/nh*100,length(find(trun>500))/nh*100))
+    %
+    durdeadq = length(find(t0rate(i,quietperiod)==0));
+    durtotq = length(t0rate(i,quietperiod));
+    drq(i) = (durtotq-durdeadq)/durtotq;
+    drlq(i) = durtotq-durdeadq;
+    durdeadn = length(find(t0rate(i,noisyperiod)==0));
+    durtotn = length(t0rate(i,noisyperiod));
+    drn(i) = (durtotn-durdeadn)/durtotn;
+    drln(i) = durtotn-durdeadn;
     
+    disp(sprintf('%3.1f / %3.1f h = %3.2f pc',durdeadq,durtotq,durdeadq./durtotq*100))
+    disp(sprintf('%3.1f / %3.1f h = %3.2f pc',durdeadn,durtotn,durdeadn./durtotn*100))
 end
+drln(ants==148)=0;
+pos_ant=SetupCharacteristics(ants,3001);
+figure(12)
+h1 = scatter(pos_ant(:,1),pos_ant(:,2),drlq/30+1e-6,'filled');
+set(h1,'MarkerFaceColor','g')
+hold on
+h2 = scatter(pos_ant(:,1),pos_ant(:,2),drln/30+1e-6,'filled');
+set(h2,'MarkerFaceColor','b')
+for i = 1:length(ants)
+    text(pos_ant(i,1)+10,pos_ant(i,2)+10,int2str(ants(i)))
+end
+xlabel('Easting (m)')
+ylabel('Northing (m)')
+%axis equal
+grid on
+xlim([-100 2800])
 pause
+
+figure(37)
+plot(ants,drlq,'gs','MarkerFaceColor','g')
+hold on
+plot(ants,drln,'rs','MarkerFaceColor','r')
+
 coincrate = t.coincrate(iasc);
 smoothrate = smooth(coincrate,24*7);
 %     unixs = t.unixs;

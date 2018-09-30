@@ -64,8 +64,8 @@ for i=1:length(cid)  % Scan all coincs in the list
   %% Compute expected delays
   %detId = CoincStruct.Det.Id(ind,in)';
   %[a ind_det]=intersect(Detectors,detId);
-  ind_det = in
-  detId = Detectors(in)'
+  ind_det = in;
+  detId = Detectors(in)';
   
   %if sum(DetectorType(ind_det))>0  % Skip scintillators
   %    continue

@@ -29,7 +29,8 @@ REFALT=2632;
 PROPAGT = 0.77; %samples/m (=3.85ns/m)
 FSAMPLING = 200e6;  %Hz
 NBITS = 8;
-SCALE = 3.3/2^NBITS;
+%SCALE = 3.3/2^NBITS;  %V/ADCcounts
+SCALE = 0.0076; 
 NFFT = 256;
 FREQMAX = 100e6;
 FREQMIN = 50e6;
@@ -155,7 +156,7 @@ if CC==0  % Local PCS, no environment variables defined
         RAWDATA_PATH = '../data/raw/';
         TEXT_PATH = './';
         CXX_PATH = '/home/martineau/TREND/cxx/';
-        LOG_PATH = '../data/log/';
+        LOG_PATH = '../TREND/data/log/';
         MONITOR_PATH = '../TREND/data/monitor/';
         if DC
             CAND_PATH = '../TREND/data/candidates/candidates_dc/'

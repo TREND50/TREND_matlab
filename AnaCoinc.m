@@ -27,9 +27,11 @@ stat = [CoincStruct.Det.Status];
 amp = [CoincStruct.Det.AmpMax];
 calampbline = Struct.Coinc.Det.CalibratedAmp1;
 calamppsd = Struct.Coinc.Det.CalibratedAmp2;
-time = max(CoincStruct.Det.UnixTime,[],2)/60;  % minutes
+ut = CoincStruct.Det.UnixTime;
+time = max(ut,[],2)/60;  % minutes
 time = time-min(time);
 duration = max(time);
+cal = load("calibCandidates.txt");
 
 % starts = [Struct.Setup.InfosRun.TimeStart];
 % stops = [Struct.Setup.InfosRun.TimeStop];
@@ -67,6 +69,7 @@ for i=1:length(cid)  % Scan all coincs in the list
        disp(sprintf('Coinc %d not found in list of reconstructed coincs.',id))
        continue
     end
+        
     coinc_min = time(ind);
     status = stat(ind,:);
     thisStatus = zeros(length(Detectors),10);
@@ -87,7 +90,7 @@ for i=1:length(cid)  % Scan all coincs in the list
       stv=fliplr(stv); %LSB first
       thisStatus(j,2:length(stv)+1) = stv;
     end
-    thisStatus
+    %thisStatus
     in = find(thisStatus(:,2)==1);
     ramp = calamppsd(ind,in)./max(calamppsd(ind,in));
     badsig = (thisStatus(:,3)==1);
@@ -98,13 +101,35 @@ for i=1:length(cid)  % Scan all coincs in the list
     envir = (thisStatus(:,8)==1);
     noisy = (thisStatus(:,9)==1);
     jump = (thisStatus(:,10)==1);
-
-    dets = Detectors(in);
+    uxtime = ut(ind,:);
+    uxtime = uxtime(uxtime>0);
+    uxtime = max(uxtime);
+    dets = Detectors(in)
     dpos = DetPos(in,:);
-    disp(sprintf('\nCoinc %d (L=%d, Lsci =%d) at %3.1f min / %3.1f mins', id, L(ind),Lsci(ind),coinc_min,duration));  
+    
+    % Get calibration info
+    runId = cal(:,1);
+    sel = find(runId==nrun);
+    if length(sel)>0
+      antCalib = cal(sel,2);
+      gain = cal(sel,3)*SCALE;  % To go back to V/V gain 
+      display 'Gain PSD:'
+      [antCalib gain]    
+    else
+      display('No gain available for this coinc')
+      gain = ones(length(in));
+      antCalib = dets;
+    end
+
+    disp(sprintf('\nCoinc %d (L=%d, Lsci =%d) at %3.1f min / %3.1f mins, UnixTime = %3.1f', id, L(ind),Lsci(ind),coinc_min,duration,uxtime));  
     disp 'AntennaId   RawAmp     CalAmp      CalAmpPSD     Status'
+    
     for j=1:L(ind)
-        disp(sprintf('   %d     %3.2f V    %3.2f A.U.     %3.2f muV      %d',dets(j),amp(ind,in(j)),calampbline(in(j)),calamppsd(in(j)),status(in(j))))   
+        inc = find(antCalib==dets(j));
+        camp(j) = amp(ind,in(j))/gain(inc)*1e6;
+        disp(sprintf('   %d     %3.2f V    %3.2f A.U.     %3.2f muV      %d',dets(j),amp(ind,in(j)),calampbline(in(j)),camp(j),status(in(j))))   
+        
+        %disp(sprintf('   %d     %3.2f V    %3.2f A.U.     %3.2f muV      %d',dets(j),amp(ind,in(j)),calampbline(in(j)),calamppsd(in(j)),status(in(j))))   
     end
     
     if isempty(ind)
@@ -138,7 +163,7 @@ for i=1:length(cid)  % Scan all coincs in the list
     close(7)
     
     %% Ground plot
-    ifig = Layout(nrun,dst);
+    ifig = Layout();
     figure(ifig)
     hold on
     % Status
@@ -161,23 +186,23 @@ for i=1:length(cid)  % Scan all coincs in the list
     else
         disp 'Source too far away for radius display.'
     end
-    
+    ramp = camp/max(camp)*100
     for j = 1:length(dets)
-        myCircle(dpos(j,1),dpos(j,2),ramp(:,j)*100)
+        myCircle(dpos(j,1),dpos(j,2),ramp(j))
     end
    
     %% Amplitude vs distance
     %AnaSph(nrun,id,dst)
-    if IsShower(ind)  % Shower reconstruction was performed
-        AnaLDF(nrun,id,dst)
-        xCore = CoincStruct.ShowerRecons.XCore;
-        yCore = CoincStruct.ShowerRecons.YCore;
-        figure(ifig)
-        plot(xCore(ind),yCore(ind),'gh','MarkerSize',8,'LineWidth',2,'MarkerFaceColor','g')
-        plotCandidate(nrun,id,dst)
-    else
-        disp 'This coinc is not a shower candidate.'
-    end
+%     if IsShower(ind)  % Shower reconstruction was performed
+%         AnaLDF(nrun,id,dst)
+%         xCore = CoincStruct.ShowerRecons.XCore;
+%         yCore = CoincStruct.ShowerRecons.YCore;
+%         figure(ifig)
+%         plot(xCore(ind),yCore(ind),'gh','MarkerSize',8,'LineWidth',2,'MarkerFaceColor','g')
+%         plotCandidate(nrun,id,dst)
+%     else
+%         disp 'This coinc is not a shower candidate.'
+%     end
     %     
     %%
     if length(cid)>1

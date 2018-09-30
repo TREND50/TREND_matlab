@@ -58,7 +58,7 @@ end
 
 %candname = [CAND_PATH sprintf('Candidates_Period%d_L4.mat',periodID)];
 %CAND_PATH = './'
-candname = [CAND_PATH sprintf('Candidates_Period%d.mat',periodID)];
+candname = [CAND_PATH sprintf('Candidates_Period%d_v22.mat',periodID)];
 disp(sprintf('Now loading DST %s...',candname))
 
 if fopen(candname)>0
@@ -86,7 +86,7 @@ if fopen(candname)>0
    if size(thisRun,2)
        disp(sprintf('Run %d already present, skip.',nrun))
        %fclose all;
-       return
+       %return
    end
    
 else
@@ -135,7 +135,7 @@ end;
 
 %% Loop on sub dsts
 meta = 1;
-filename = [CAND_PATH sprintf('selection_Period%d.txt',periodID)];
+filename = [CAND_PATH sprintf('selection_Period%d_v22.txt',periodID)];
 
 while meta<=nbiter
 
@@ -431,13 +431,27 @@ while meta<=nbiter
         if size(r,1)>1  % Radius defined as a  line vector instead of column for some runs
             r = r';
         end
-        azsel = find(chi2p<cutsettings.Chi2pCut & abs(slopep-1)<0.1 & chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phip-phip(ind))<cutsettings.PhiCut);        
+        deltaphip = phip-phip(ind);
+        % Handle properly case around 0°
+        deltaphip(deltaphip>180) = deltaphip(deltaphip>180)-360;
+        deltaphip(deltaphip<-180) = deltaphip(deltaphip<-180)+360;
+        azsel = find(chi2p<cutsettings.Chi2pCut & abs(slopep-1)<0.1 & chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(deltaphip)<cutsettings.PhiCut);   % Original     
+        %azsel = find(chi2p<cutsettings.Chi2pCut & abs(slopep-1)<0.1 & chi2s<cutsettings.Chi2sCut & abs(slopes-1)<0.1 & r>500 & abs(phip-phip(ind))<cutsettings.PhiCut);        
         comdir = zeros(3,5);
         DirTimeCut = cutsettings.DirTimeVector;
         for t = 1:length(DirTimeCut)
             timesel2 = find(abs(times-times(ind))<DirTimeCut(t));  %seconds
             neighbourgs = intersect(timesel2,azsel);
             common = zeros(1,length(neighbourgs));
+%             neigh = idp(neighbourgs)
+%             coco = idp(azsel)
+%             %kiki = idp(timesel)
+%             phis(ind)
+%             if idp(ind)==364527
+%                 figure(34)
+%                 hist(phis-phis(ind),200)
+%                 pause
+%             end
             for j = 1:length(neighbourgs)
                 toto=tag(neighbourgs(j),:)+tag(ind,:);
                 common(j) = length(find(toto==2))./mult(ind);
@@ -473,9 +487,8 @@ while meta<=nbiter
              n5 = n5+1;
         end
     end
-    res = [nrun meta res n1 n2 n3 n4 n5 length(find(CandidateRun==nrun))]
-    filename
-    fid = fopen(filename, 'a+' )
+    res = [nrun meta res n1 n2 n3 n4 n5 length(find(CandidateRun==nrun))];
+    fid = fopen(filename, 'a+' );
     fprintf( fid, '%6d ', res(1));   % Run
     fprintf( fid, '%6d ', res(2));   % MetaRun
     fprintf( fid, '%6d ', res(3));   % Nini

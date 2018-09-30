@@ -21,11 +21,19 @@ end
 dst.Struct = Dist2Source(dst.Struct);
 %dst.Struct = CleanFilt(dst.Struct);
 
+
+
+
+
+
+
+
 ncoincs = dst.Struct.Setup.TotalCoinc;
 DetStruct = dst.Struct.Setup.Det;
 Detectors = [DetStruct.Name];
 DetectorType = [dst.Struct.Setup.Det.isScint];
 evt = [dst.Struct.Coinc.Det.Evt];
+%tag = [dst.Struct.Coinc.Det.Tag];
 nDets = length(Detectors);
 nScints = sum(DetectorType);
 nAnts = nDets-nScints;
@@ -106,8 +114,8 @@ end
 mult = mult(sel);
 timetot = time;
 time = time(sel);
-tmin = min(min(time));  % Max 
-tmax = max(max(time));
+tmin = min(min(time))-1;  
+tmax = max(max(time))+1;
 thetap = thetap(sel);
 phip = phip(sel);
 thetas = thetas(sel);
@@ -126,24 +134,22 @@ list = idp;
 temp = zeros(length(sel),length(Detectors)); 
 temp =  evt(sel,:);
 evt = temp;
-format long
-time(1)+date_start
-pause
-% %% Selection to file
-selection = [];
-for i = 1:length(sel)
-    in = find(evt(i,:)>0);
-    l = length(in);
-    selection(end+1:end+l,1:3) = [idp(i)*ones(l,1) Detectors(in)'  evt(i,in)'];
-end
-filename = sprintf('R%d_sel.mat',nrun);
-save(filename,'selection')
-for i = 1:length(Detectors)
-  thisDet = find(selection(:,2)==Detectors(i));
-  if length(thisDet)>0
-    disp(sprintf('%d events saved for detector %d. 1st is %d, last is %d.',length(thisDet),Detectors(i),selection(thisDet(1),3),selection(thisDet(end),3)))
-  end
-end
+
+% % %% Selection to file
+% selection = [];
+% for i = 1:length(sel)
+%     in = find(evt(i,:)>0);
+%     l = length(in);
+%     selection(end+1:end+l,1:3) = [idp(i)*ones(l,1) Detectors(in)'  evt(i,in)'];
+% end
+% filename = sprintf('R%d_sel.mat',nrun);
+% save(filename,'selection')
+% for i = 1:length(Detectors)
+%   thisDet = find(selection(:,2)==Detectors(i));
+%   if length(thisDet)>0
+%     disp(sprintf('%d events saved for detector %d. 1st is %d, last is %d.',length(thisDet),Detectors(i),selection(thisDet(1),3),selection(thisDet(end),3)))
+%   end
+% end
 
 %% Recons Analysis
 figure(1)
@@ -203,6 +209,7 @@ eventrate = eventrate/60;
 plot(0:tmax,eventrate,'k','LineWidth',2)
 xlabel('Time [mn]', labelOpts{:})
 ylabel('Coinc rate [Hz]', labelOpts{:})
+
 xlim([tmin tmax])
 grid on
 subplot(3,1,3)
@@ -220,6 +227,11 @@ end
 xlim([tmin tmax])
 ylim([0 360])
 grid on
+for ii = 1:length(time)
+  disp(sprintf('%d %3.1f %3.1f',idp(ii),time(ii),phis(ii)))
+  detsIn = Detectors(evt(ii,:)>0);
+end
+
 %list = eventrate;
 
 %% Skyplots
@@ -308,7 +320,7 @@ for lcut=linf:step:lsup
     ic = ic+1;
     hold on
 end
-plot( DetPosX(DetectorType==0), DetPosY(DetectorType==0), '^b', 'MarkerSize', 8, 'MarkerFaceColor','w','LineWidth',2 );  %Ground view  
+plot( DetPosX(DetectorType==0), DetPosY(DetectorType==0), '^y', 'MarkerSize', 8, 'MarkerFaceColor','w','LineWidth',2 );  %Ground view  
 plot( DetPosX(DetectorType==1), DetPosY(DetectorType==1), 'rs', 'MarkerSize', 8, 'MarkerFaceColor','r' );  %Ground view  
 axis([-1000 5000 -2000 7000])
 xlabel('W-E [m]',labelOpts{:})
@@ -324,3 +336,11 @@ datastats(xs);
 subplot(2,1,2)
 hist(ys,100)
 datastats(ys);
+
+% figure(23)
+% local = find(-1000<xs & xs<3000 & -1000<ys & ys<1500);
+% ndhist(xs(local),ys(local),'bins',6,'log')
+% colorbar
+% hold on
+% plot( DetPosX(DetectorType==0), DetPosY(DetectorType==0), '^y', 'MarkerSize', 4, 'MarkerFaceColor','y','LineWidth',1 );  %Ground view  
+% crossPointEnvir

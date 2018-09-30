@@ -6,12 +6,13 @@ function [r f] = AnaLogOldFormat( nrun, antenna, dis )
 
 r = 0;
 f = 0;
-% if nrun>=3561
-%     disp(sprintf('Error: AnaLogOldFormat valid priori to R3561 only... Launching AnaLog(%d)',nrun))
+if nrun>=3561
+    disp(sprintf('Error: AnaLogOldFormat valid prior to R3561 only.'))
+%     disp(sprintf('Launching AnaLog(%d)',nrun))
 %     pause(3)
 %     AnaLog(nrun,antenna);
-%     return
-% end
+    return
+end
 
 if ~exist('dis')
     dis = 1;
