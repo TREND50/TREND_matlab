@@ -19,7 +19,7 @@ Evt=[RunSetup.Det.Evt];
 CoincStruct = Struct.Coinc;
 tag = CoincStruct.Det.Tag;
 multant = CoincStruct.MultAnt;
-multsci = CoincStruct.MultSci;
+%multsci = CoincStruct.MultSci;
 indsci=find([RunSetup.Det.isScint]==1);
 indant=find([RunSetup.Det.isScint]==0);
 MinRaw = CoincStruct.Det.MinRaw;
@@ -95,9 +95,11 @@ for j = 1:length(CoincStruct.IdCoinc)  % loop on all valid coincs
         
         n = n+1;
 
-        uTime = CoincStruct.Det.Time(j,iDetsIn)';
+        %uTime = CoincStruct.Det.Time(j,iDetsIn)';
+        uTime = CoincStruct.Det.UnixTime(j,iDetsIn)';
         CoincId = CoincStruct.IdCoinc(j)*ones(nDetsIn,1);
-        AntId = CoincStruct.Det.Id(j,iDetsIn)';
+        %AntId = CoincStruct.Det.Id(j,iDetsIn)';
+        AntId = Detectors(iDetsIn)';
         EvtId = CoincStruct.Det.Evt(j,iDetsIn)';
         trigTime = TrigTime(j,iDetsIn)'-min(TrigTime(j,iDetsIn));
         if CORREL
